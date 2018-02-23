@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -39,7 +40,13 @@ import io.swagger.annotations.ResponseHeader;
 public class AuthenticationResource {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	   
+
+	@Value("${auth.service.secret}")
+	private String SECTER;
+	
+	@Value("${auth.service.issuer}")
+	private String ISSUER;	
+	
 	@Autowired
 	UserRepository userRepository;
 	
@@ -81,9 +88,9 @@ public class AuthenticationResource {
 			LocalDateTime now = LocalDateTime.now().plusHours(1);
 			Date expDate = Date.from(now.toInstant(OffsetDateTime.now().getOffset()));
 			
-		    Algorithm algorithm = Algorithm.HMAC256("desertdolphin");
+		    Algorithm algorithm = Algorithm.HMAC256(SECTER);
 		    token = JWT.create()
-		        .withIssuer("mbronshteyn.com")
+		        .withIssuer(ISSUER)
 		        .withSubject(user.getUserId())
 		        .withClaim("role", user.getRole().toString())
 		        .withExpiresAt(expDate)
