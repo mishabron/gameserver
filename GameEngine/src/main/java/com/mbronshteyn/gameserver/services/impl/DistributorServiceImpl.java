@@ -74,8 +74,7 @@ public class DistributorServiceImpl implements  DistributorService{
 		user.setRole(UserRoles.DISTRIBUTOR);
 		//user.setUpdateBy(updateBy);
 		
-		Client client = ClientBuilder.newClient();		
-		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
+		createUser(user,jwt);
 		
 		return newDist;
 	}
@@ -103,8 +102,7 @@ public class DistributorServiceImpl implements  DistributorService{
 		user.setPassword(contactDto.getPassword());
 		user.setRole(UserRoles.DISTRIBUTOR);
 
-		Client client = ClientBuilder.newClient();		
-		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
+		createUser(user,jwt);
 		
 		return contact;
 	}
@@ -116,6 +114,7 @@ public class DistributorServiceImpl implements  DistributorService{
 	}
 
 	@Override
+	@Transactional	
 	public Vendor addVendor(VendorDto vendorDto,String jwt) {
 
 		Vendor vendor = vendorDto.getVendor();
@@ -131,13 +130,19 @@ public class DistributorServiceImpl implements  DistributorService{
 		user.setPassword(vendorDto.getPassword());
 		user.setRole(UserRoles.DISTRIBUTOR);
 
-		Client client = ClientBuilder.newClient();		
-		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
+		createUser(user,jwt);
 		
 		return vendor;		
 	}
 
 
-
+	private void createUser(UserDto user, String jwt) {
+		
+		Client client = ClientBuilder.newClient();		
+		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
+		if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+			throw new RuntimeException("Exception creating user ");			
+		}		
+	}
 
 }
