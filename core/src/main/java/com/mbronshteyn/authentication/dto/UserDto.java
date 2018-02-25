@@ -8,6 +8,7 @@ public class UserDto {
 	private String email;
 	private String password;
 	private UserRoles role;
+	private String updateBy;
 	
 	public String getUserId() {
 		return userId;
@@ -32,6 +33,12 @@ public class UserDto {
 	}
 	public void setRole(UserRoles role) {
 		this.role = role;
+	}
+	public String getUpdateBy() {
+		return updateBy;
+	}
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
 	}	
 
 	
