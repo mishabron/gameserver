@@ -19,6 +19,7 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -26,21 +27,29 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+@Component
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
-	@Value("${auth.service.secret}")
-	private String SECTER;
-	
-	@Value("${auth.service.issuer}")
+	private String SECRET;	
 	private String ISSUER;	
 	
     @Context
     UriInfo uriInfo;
     
+	public AuthenticationFilter() {
+		SECRET = null;
+		ISSUER = null;
+	}
+	
+	public AuthenticationFilter(String sECRET2, String iSSUER2) {
+		SECRET = sECRET2;
+		ISSUER = iSSUER2;
+	}
+
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 		
@@ -91,7 +100,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	private User validateToken(String authHeaderVal) throws JWTVerificationException, UnsupportedEncodingException {
 
-	    Algorithm algorithm = Algorithm.HMAC256(SECTER);
+	    Algorithm algorithm = Algorithm.HMAC256(SECRET);
 	    JWTVerifier verifier = JWT.require(algorithm).withIssuer(ISSUER).build(); //Reusable verifier instance
 	    DecodedJWT jwt = verifier.verify(authHeaderVal);
 		

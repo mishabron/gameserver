@@ -19,14 +19,13 @@ import com.mbronshteyn.authentication.security.filters.AuthenticationFilter;
 public class AuthenticationApplication extends ResourceConfig{
 
 	public AuthenticationApplication() {
-        //packages(this.getClass().getPackage().getName());
+
         register(io.swagger.jaxrs.listing.ApiListingResource.class);
         register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
         
         register(AuthenticationResource.class); 
         register(UserResource.class);  
-          
-        register(AuthenticationFilter.class);          
+                
         register(RolesAllowedDynamicFeature.class);  
         register(AuthinticationDynamicFeature.class);         
 	}

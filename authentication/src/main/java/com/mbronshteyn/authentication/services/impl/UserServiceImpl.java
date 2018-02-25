@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 		user.setUserId(userDto.getUserId());
 		user.setPassword(userDto.getPassword());
 		user.setRole(userDto.getRole());
-		//user.setUpdateBy(updateBy);
+		user.setUpdateBy(userDto.getUpdateBy());
 		
 		user = userRepository.save(user);
 		

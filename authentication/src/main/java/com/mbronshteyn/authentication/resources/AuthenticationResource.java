@@ -42,7 +42,7 @@ public class AuthenticationResource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	@Value("${auth.service.secret}")
-	private String SECTER;
+	private String SECRET;
 	
 	@Value("${auth.service.issuer}")
 	private String ISSUER;	
@@ -88,7 +88,7 @@ public class AuthenticationResource {
 			LocalDateTime now = LocalDateTime.now().plusHours(1);
 			Date expDate = Date.from(now.toInstant(OffsetDateTime.now().getOffset()));
 			
-		    Algorithm algorithm = Algorithm.HMAC256(SECTER);
+		    Algorithm algorithm = Algorithm.HMAC256(SECRET);
 		    token = JWT.create()
 		        .withIssuer(ISSUER)
 		        .withSubject(user.getUserId())
