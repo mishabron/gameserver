@@ -1,7 +1,9 @@
 package com.mbronshteyn.gameserver.resources;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -10,9 +12,15 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +30,7 @@ import com.mbronshteyn.gameserver.data.Vendor;
 import com.mbronshteyn.gameserver.dto.ContactDto;
 import com.mbronshteyn.gameserver.dto.DistributorDto;
 import com.mbronshteyn.gameserver.dto.VendorDto;
+import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.DistributorService;
 
 import io.swagger.annotations.Api;
@@ -34,6 +43,11 @@ import io.swagger.annotations.ApiResponses;
 @Path("/Distributors")
 @Api(value = "/distributors")
 public class DistributorResource {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+	@Context  //injected response proxy supporting multiple threads
+	private HttpServletResponse response;
 
 	@HeaderParam(HttpHeaders.AUTHORIZATION) 
 	String jwt;
@@ -73,12 +87,21 @@ public class DistributorResource {
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add new Distributor", notes="Creates new Distributor")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful Contact update", response = Distributor.class),
+            @ApiResponse(code = 200, message = "Successful Contact update", response = Distributor.class),            
+            @ApiResponse(code = 401, message = "Resource not found"),
+            @ApiResponse(code = 403, message = "Access Forbidden for this user"),                        
             @ApiResponse(code = 404, message = "Resource not found"),
             @ApiResponse(code = 500, message = "Internal server error")})		
 	public Distributor addDistributor(@ApiParam(name = "distributor", value = "new distributor record", required = true)  DistributorDto distributor) {
 		
-		Distributor newDist = distributorService.addDistributor(distributor,jwt);
+		Distributor newDist = null;
+		try {
+			newDist = distributorService.addDistributor(distributor,jwt);
+		} catch (GameServerException e) {
+			LOGGER.error("Error creating Distributor");			
+		    Response response = Response.status(e.getErrorStatus()).build();
+		    throw new WebApplicationException(response);			
+		}
 		
 		return newDist;
 		
@@ -103,12 +126,21 @@ public class DistributorResource {
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add new Contact to Distributor", notes="Adds new Contact to Distributor.")	
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful creation of Contact ", response = Contact.class),
+            @ApiResponse(code = 200, message = "Successful creation of Contact ", response = Contact.class),            
+            @ApiResponse(code = 401, message = "Resource not found"),
+            @ApiResponse(code = 403, message = "Access Forbidden for this user"),                        
             @ApiResponse(code = 404, message = "Resource not found"),
             @ApiResponse(code = 500, message = "Internal server error")})	
     public Contact addContact(@ApiParam(name = "contactDto", value = "ContactDto contaning new Contact record", required = true) ContactDto contact) {
 		
-		Contact newContact = distributorService.addContact(contact,jwt);
+		Contact newContact = null;
+		try {
+			newContact = distributorService.addContact(contact,jwt);
+		} catch (GameServerException e) {
+			LOGGER.error("Error creating Contact");			
+		    Response response = Response.status(e.getErrorStatus()).build();
+		    throw new WebApplicationException(response);			
+		}
         
         return newContact;
     }
@@ -133,11 +165,20 @@ public class DistributorResource {
     @ApiOperation(value = "Add new Vendor to Distributor", notes="Adds new Vendor to Distributor.")	
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful creation of Vendor ", response = Contact.class),
-            @ApiResponse(code = 404, message = "Resource not found"),
+            @ApiResponse(code = 401, message = "Resource not found"),
+            @ApiResponse(code = 403, message = "Access Forbidden for this user"),            
+            @ApiResponse(code = 404, message = "Access Not Authorized for this user"),
             @ApiResponse(code = 500, message = "Internal server error")})	
     public Vendor addVendor(@ApiParam(name = "vendorDto", value = "VendorDto contaning new Vendor record", required = true) VendorDto vendor) {
 		
-		Vendor newVendor = distributorService.addVendor(vendor,jwt);
+		Vendor newVendor = null;
+		try {
+			newVendor = distributorService.addVendor(vendor,jwt);
+		} catch (GameServerException e) {
+			LOGGER.error("Error creating Vendor");			
+		    Response response = Response.status(e.getErrorStatus()).build();
+		    throw new WebApplicationException(response);			
+		}
         
         return newVendor;
     }	

@@ -25,6 +25,7 @@ import com.mbronshteyn.gameserver.data.repository.VendorRepository;
 import com.mbronshteyn.gameserver.dto.ContactDto;
 import com.mbronshteyn.gameserver.dto.DistributorDto;
 import com.mbronshteyn.gameserver.dto.VendorDto;
+import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.DistributorService;
 
 @Service
@@ -59,7 +60,7 @@ public class DistributorServiceImpl implements  DistributorService{
 
 	@Override
 	@Transactional		
-	public Distributor addDistributor(DistributorDto distributorDto,String jwt) {
+	public Distributor addDistributor(DistributorDto distributorDto,String jwt) throws GameServerException {
 
 		Distributor distributor = distributorDto.getDistributor();
 		distributor.setId(null);
@@ -87,7 +88,7 @@ public class DistributorServiceImpl implements  DistributorService{
 
 	@Override
 	@Transactional	
-	public Contact addContact(ContactDto contactDto,String jwt) {
+	public Contact addContact(ContactDto contactDto,String jwt) throws GameServerException {
 		
 		Contact contact = contactDto.getContact();
 		contact.setId(null);
@@ -114,8 +115,8 @@ public class DistributorServiceImpl implements  DistributorService{
 	}
 
 	@Override
-	@Transactional	
-	public Vendor addVendor(VendorDto vendorDto,String jwt) {
+	@Transactional(rollbackFor = Exception.class)	
+	public Vendor addVendor(VendorDto vendorDto,String jwt) throws GameServerException {
 
 		Vendor vendor = vendorDto.getVendor();
 		vendor.setId(null);
@@ -136,12 +137,12 @@ public class DistributorServiceImpl implements  DistributorService{
 	}
 
 
-	private void createUser(UserDto user, String jwt) {
+	private void createUser(UserDto user, String jwt) throws GameServerException {
 		
 		Client client = ClientBuilder.newClient();		
 		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
 		if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-			throw new RuntimeException("Exception creating user ");			
+			throw new GameServerException("Exception creating user ",response.getStatus());			
 		}		
 	}
 
