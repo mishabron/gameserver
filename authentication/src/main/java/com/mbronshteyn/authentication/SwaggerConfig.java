@@ -20,7 +20,7 @@ public class SwaggerConfig {
         beanConfig.setResourcePackage(AuthenticationResource.class.getPackage().getName());  
         beanConfig.setTitle("Authentication Service Backend API");
         beanConfig.setVersion("v1");  
-        beanConfig.setSchemes(new String[] { "http", "https" });
+        beanConfig.setSchemes(new String[] {"https"});
         beanConfig.setBasePath(apiPath);        
         beanConfig.setPrettyPrint(true);
         beanConfig.setScan(true);        
