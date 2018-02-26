@@ -1,5 +1,6 @@
 package com.mbronshteyn.authentication.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mbronshteyn.authentication.model.UserRoles;
 
 public class UserDto {
@@ -8,6 +9,8 @@ public class UserDto {
 	private String email;
 	private String password;
 	private UserRoles role;
+	
+    @JsonIgnore 	
 	private String updateBy;
 	
 	public String getUserId() {

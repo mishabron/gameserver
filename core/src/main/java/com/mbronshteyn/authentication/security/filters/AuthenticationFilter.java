@@ -19,6 +19,8 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -34,17 +36,16 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
-	private String SECRET;	
+	private String SECRET;		
 	private String ISSUER;	
 	
     @Context
     UriInfo uriInfo;
     
 	public AuthenticationFilter() {
-		SECRET = null;
-		ISSUER = null;
+
 	}
-	
+
 	public AuthenticationFilter(String sECRET2, String iSSUER2) {
 		SECRET = sECRET2;
 		ISSUER = iSSUER2;
@@ -55,14 +56,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		
 		String authHeaderVal = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);	
 		
-		if(authHeaderVal == null || authHeaderVal.equals("")) {
+		if(authHeaderVal == null || authHeaderVal.trim().equals("")) {
 			LOGGER.error("Authintication is Invalid");	
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());			
 		}
 		
 		try {
 			
-			User user = validateToken(authHeaderVal);
+			final User user = validateToken(authHeaderVal);
 			if (user != null) {
 				requestContext.setSecurityContext(new SecurityContext() {
 					@Override
