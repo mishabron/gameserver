@@ -12,9 +12,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import com.mbronshteyn.authentication.resources.AuthenticationResource;
 import com.mbronshteyn.authentication.resources.UserResource;
 import com.mbronshteyn.authentication.security.binding.AuthinticationDynamicFeature;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableEncryptableProperties
 @EnableAutoConfiguration(exclude = { ErrorMvcAutoConfiguration.class })
 public class AuthenticationApplication extends ResourceConfig{
     
