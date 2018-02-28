@@ -9,9 +9,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import com.mbronshteyn.gameserver.resources.DistributorResource;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableEncryptableProperties
 @EnableAutoConfiguration(exclude = { ErrorMvcAutoConfiguration.class })
 public class GameEngineApplication extends ResourceConfig{
 

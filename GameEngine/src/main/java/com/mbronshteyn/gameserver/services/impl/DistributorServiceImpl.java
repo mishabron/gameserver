@@ -1,5 +1,7 @@
 package com.mbronshteyn.gameserver.services.impl;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.ws.rs.client.Client;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mbronshteyn.authentication.dto.UserDto;
 import com.mbronshteyn.authentication.model.UserRoles;
+import com.mbronshteyn.authentication.security.ssl.JerseyWithSSL;
 import com.mbronshteyn.gameserver.data.Contact;
 import com.mbronshteyn.gameserver.data.Distributor;
 import com.mbronshteyn.gameserver.data.Vendor;
@@ -138,8 +141,15 @@ public class DistributorServiceImpl implements  DistributorService{
 
 
 	private void createUser(UserDto user, String jwt) throws GameServerException {
+				
+		JerseyWithSSL sslClientBuilder = new JerseyWithSSL();
+		Client client = null;
+		try {
+			client = sslClientBuilder.initClient();
+		} catch (KeyManagementException | NoSuchAlgorithmException e) {
+			throw new GameServerException(e.getMessage());
+		}	
 		
-		Client client = ClientBuilder.newClient();		
 		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
 		if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
 			throw new GameServerException("Exception creating user ",response.getStatus());			
