@@ -15,6 +15,10 @@ public class GameServerException extends Exception {
 		this.errorStatus = errorStatus;
 	}
 
+	public GameServerException(String message2) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String getMessage() {
 		return message;
 	}
