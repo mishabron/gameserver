@@ -15,20 +15,15 @@ import com.mbronshteyn.authentication.security.filters.AuthenticationFilter;
 @Configuration
 @Provider
 public class AuthinticationDynamicFeature implements DynamicFeature {
-
-	@Value("${auth.service.secret}")
-	private String SECRET;	
-	@Value("${auth.service.issuer}")	
-	private String ISSUER;	
 	
 	@Override
 	public void configure(ResourceInfo resourceInfo, FeatureContext context) {
 
-		final AnnotatedMethod am = new AnnotatedMethod(resourceInfo.getResourceMethod());
-		
-        RolesAllowed ra = am.getAnnotation(RolesAllowed.class);
-        if (ra != null) {
-        	context.register(new AuthenticationFilter(SECRET,ISSUER));
+        RolesAllowed ca = resourceInfo.getResourceClass().getAnnotation(RolesAllowed.class);       		
+        RolesAllowed ra = resourceInfo.getResourceMethod().getAnnotation(RolesAllowed.class);
+        
+        if (ca != null || ra != null) {
+        	context.register(AuthenticationFilter.class);
         }	
 		
 	}

@@ -102,7 +102,7 @@
 		      <artifactId>docker-maven-plugin</artifactId>
 		      <version>1.0.0</version>
 		      <configuration>
-		        <imageName>mbronshteyn/gameserver</imageName>
+		        <imageName>gameserver</imageName>
 		        <baseImage>java:openjdk-8-jdk-alpine</baseImage>
 		        <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 		        <!-- copy the service's jar file from target into the root directory of the image --> 

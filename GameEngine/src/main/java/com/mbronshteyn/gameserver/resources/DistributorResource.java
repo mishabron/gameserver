@@ -3,6 +3,7 @@ package com.mbronshteyn.gameserver.resources;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -41,7 +42,13 @@ import io.swagger.annotations.ApiResponses;
 
 @Component
 @Path("/Distributors")
+@RolesAllowed({"LOTOROLA_MANAGER"})	
 @Api(value = "/distributors")
+@ApiResponses(value = {           
+        @ApiResponse(code = 401, message = "User not Unauthorized"),
+        @ApiResponse(code = 403, message = "Access Forbidden for this user"),                        
+        @ApiResponse(code = 404, message = "Resource not found"),
+        @ApiResponse(code = 500, message = "Internal server error")})
 public class DistributorResource {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -54,15 +61,12 @@ public class DistributorResource {
 	
 	@Autowired
 	DistributorService distributorService;
-	
+				
 	@GET
     @Path("/get")
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Retrieve Distributor", notes="Retrieve Distributor record.")	
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful retrieval of Distributor ", response = Distributor.class),
-            @ApiResponse(code = 404, message = "Messages not found"),
-            @ApiResponse(code = 500, message = "Internal server error")})	
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful retrieval of Distributor ", response = Distributor.class)})	
     public Distributor getDistributor(@ApiParam(name = "id", value = "ID for given distributor", required = true)  
     		@QueryParam("id")  Long distributorId) {
         return distributorService.getDistributor(distributorId);
@@ -72,10 +76,7 @@ public class DistributorResource {
     @Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Retrieve All Distributors", notes="Retrieve All Distributor records.")	
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful retrieval of Distributors ", response = Distributor.class,responseContainer = "List"),
-            @ApiResponse(code = 404, message = "Messages not found"),
-            @ApiResponse(code = 500, message = "Internal server error")})	
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful retrieval of Distributors ", response = Distributor.class,responseContainer = "List")})	
     public List<Distributor> getAllDistributors() {
         return distributorService.getDistributors();
     }	
@@ -86,12 +87,7 @@ public class DistributorResource {
 	@Consumes(MediaType.APPLICATION_JSON)	
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add new Distributor", notes="Creates new Distributor")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful Contact update", response = Distributor.class),            
-            @ApiResponse(code = 401, message = "Resource not found"),
-            @ApiResponse(code = 403, message = "Access Forbidden for this user"),                        
-            @ApiResponse(code = 404, message = "Resource not found"),
-            @ApiResponse(code = 500, message = "Internal server error")})		
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Contact update", response = Distributor.class)})		
 	public Distributor addDistributor(@ApiParam(name = "distributor", value = "new distributor record", required = true)  DistributorDto distributor) {
 		
 		Distributor newDist = null;
@@ -103,18 +99,14 @@ public class DistributorResource {
 		    throw new WebApplicationException(response);			
 		}
 		
-		return newDist;
-		
+		return newDist;		
 	}
 	
 	@GET
     @Path("/Contacts/get")
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Retrieve Contacts for Distributor", notes="Retrieve Contacts for Distributor.")	
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful retrieval of Contacts ", response = Contact.class,responseContainer = "List"),
-            @ApiResponse(code = 404, message = "Messages not found"),
-            @ApiResponse(code = 500, message = "Internal server error")})	
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful retrieval of Contacts ", response = Contact.class,responseContainer = "List")})	
     public List<Contact> getContacts(@ApiParam(name = "id", value = "ID for given distributor", required = true)  
     		@QueryParam("id")  Long distributorId) {
         return distributorService.getContacts(distributorId);
@@ -125,12 +117,7 @@ public class DistributorResource {
 	@Consumes(MediaType.APPLICATION_JSON)	
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add new Contact to Distributor", notes="Adds new Contact to Distributor.")	
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful creation of Contact ", response = Contact.class),            
-            @ApiResponse(code = 401, message = "Resource not found"),
-            @ApiResponse(code = 403, message = "Access Forbidden for this user"),                        
-            @ApiResponse(code = 404, message = "Resource not found"),
-            @ApiResponse(code = 500, message = "Internal server error")})	
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful creation of Contact ", response = Contact.class)})	
     public Contact addContact(@ApiParam(name = "contactDto", value = "ContactDto contaning new Contact record", required = true) ContactDto contact) {
 		
 		Contact newContact = null;
@@ -149,10 +136,7 @@ public class DistributorResource {
     @Path("/Vendors/get")
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Retrieve Vandors for Distributor", notes="Retrieve Vendors for Distributor.")	
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful retrieval of Vendors ", response = Vendor.class,responseContainer = "List"),
-            @ApiResponse(code = 404, message = "Messages not found"),
-            @ApiResponse(code = 500, message = "Internal server error")})	
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful retrieval of Vendors ", response = Vendor.class,responseContainer = "List")})	
     public List<Vendor> getVendors(@ApiParam(name = "id", value = "ID for given distributor", required = true)  
     		@QueryParam("id")  Long distributorId) {
         return distributorService.getVendors(distributorId);
@@ -163,12 +147,7 @@ public class DistributorResource {
 	@Consumes(MediaType.APPLICATION_JSON)	
 	@Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add new Vendor to Distributor", notes="Adds new Vendor to Distributor.")	
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful creation of Vendor ", response = Contact.class),
-            @ApiResponse(code = 401, message = "Resource not found"),
-            @ApiResponse(code = 403, message = "Access Forbidden for this user"),            
-            @ApiResponse(code = 404, message = "Access Not Authorized for this user"),
-            @ApiResponse(code = 500, message = "Internal server error")})	
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful creation of Vendor ", response = Contact.class)})	
     public Vendor addVendor(@ApiParam(name = "vendorDto", value = "VendorDto contaning new Vendor record", required = true) VendorDto vendor) {
 		
 		Vendor newVendor = null;

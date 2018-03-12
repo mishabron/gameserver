@@ -18,6 +18,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration;
@@ -46,7 +47,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	}
 
-	public AuthenticationFilter(String sECRET2, String iSSUER2) {
+	@Autowired	
+	public AuthenticationFilter(@Value("${auth.service.secret}")String sECRET2, @Value("${auth.service.issuer}") String iSSUER2) {
 		SECRET = sECRET2;
 		ISSUER = iSSUER2;
 	}
@@ -60,43 +62,44 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			LOGGER.error("Authintication is Invalid");	
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());			
 		}
-		
-		try {
-			
-			final User user = validateToken(authHeaderVal);
-			if (user != null) {
-				requestContext.setSecurityContext(new SecurityContext() {
-					@Override
-					public Principal getUserPrincipal() {
-						return new Principal() {
-							@Override
-							public String getName() {
-								return user.getUserId();
-							}
-						};
-					}
+		else {
+			try {
 
-					@Override
-					public boolean isUserInRole(String role) {
-						String roles = user.getRole();
-						return roles.contains(role);
-					}
+				final User user = validateToken(authHeaderVal);
+				if (user != null) {
+					requestContext.setSecurityContext(new SecurityContext() {
+						@Override
+						public Principal getUserPrincipal() {
+							return new Principal() {
+								@Override
+								public String getName() {
+									return user.getUserId();
+								}
+							};
+						}
 
-					@Override
-					public boolean isSecure() {
-						return uriInfo.getAbsolutePath().toString().startsWith("https");
-					}
+						@Override
+						public boolean isUserInRole(String role) {
+							String roles = user.getRole();
+							return roles.contains(role);
+						}
 
-					@Override
-					public String getAuthenticationScheme() {
-						return "Token-Based-Auth-Scheme";
-					}
-				});
-			}		
-		} catch (JWTVerificationException e) {
-			LOGGER.error("Authintication is Invalid");	
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-		}	
+						@Override
+						public boolean isSecure() {
+							return uriInfo.getAbsolutePath().toString().startsWith("https");
+						}
+
+						@Override
+						public String getAuthenticationScheme() {
+							return "Token-Based-Auth-Scheme";
+						}
+					});
+				}		
+			} catch (JWTVerificationException e) {
+				LOGGER.error("Authintication is Invalid");	
+				requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+			}
+		}
 	}
 
 	private User validateToken(String authHeaderVal) throws JWTVerificationException, UnsupportedEncodingException {
