@@ -53,9 +53,6 @@ public class DistributorResource {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	@Context  //injected response proxy supporting multiple threads
-	private HttpServletResponse response;
-
 	@HeaderParam(HttpHeaders.AUTHORIZATION) 
 	String jwt;
 	
@@ -79,8 +76,7 @@ public class DistributorResource {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful retrieval of Distributors ", response = Distributor.class,responseContainer = "List")})	
     public List<Distributor> getAllDistributors() {
         return distributorService.getDistributors();
-    }	
-	
+    }		
 	
 	@PUT
     @Path("/distributor")
