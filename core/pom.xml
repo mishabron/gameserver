@@ -5,16 +5,15 @@
   <groupId>com.mbronshteyn</groupId>
   <artifactId>core</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <name>core</name>
   <url>http://maven.apache.org</url>
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.10.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>com.mbronshteyn</groupId>
+		<artifactId>gameserver</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	
   <properties>
@@ -46,4 +45,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 </project>
