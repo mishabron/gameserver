@@ -1,4 +1,4 @@
-package com.mbronshteyn.gameserver.data;
+package com.mbronshteyn.data.vendor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,24 +16,26 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+
 /**
- * The persistent class for the Contact database table.
+ * The persistent class for the Vendor database table.
  * 
  */
 @Entity
-@NamedQuery(name="Contact.findAll", query="SELECT c FROM Contact c")
+@NamedQuery(name="Vendor.findAll", query="SELECT v FROM Vendor v")
 @EntityListeners(AuditingEntityListener.class)
-public class Contact implements Serializable {
+public class Vendor implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO,generator="native")
-	@GenericGenerator(name = "native",strategy = "native")	
+	@GenericGenerator(name = "native",strategy = "native")		
 	@JsonIgnore		
 	private Long id;
 
@@ -49,20 +51,24 @@ public class Contact implements Serializable {
 	@Column(name="Telephone")
 	private String telephone;
 
+	@Column(name="UpdateBy")
+	@LastModifiedBy
+	@JsonIgnore		
+	private String updateBy;
+
 	@Column(name="UpdateTime")
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-    @JsonIgnore    
+    @JsonIgnore 	
 	private Date updateTime;
-	
+
 	//bi-directional many-to-one association to Distributor
 	@ManyToOne
 	@JoinColumn(name="Distributor_id")
 	@JsonIgnore		
 	private Distributor distributor;
-
-
-	public Contact() {
+	
+	public Vendor() {
 	}
 
 	public Long getId() {
@@ -105,6 +111,14 @@ public class Contact implements Serializable {
 		this.telephone = telephone;
 	}
 
+	public String getUpdateBy() {
+		return this.updateBy;
+	}
+
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+
 	public Date getUpdateTime() {
 		return this.updateTime;
 	}
@@ -121,6 +135,8 @@ public class Contact implements Serializable {
 		this.distributor = distributor;
 	}
 
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -131,6 +147,7 @@ public class Contact implements Serializable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((last_name == null) ? 0 : last_name.hashCode());
 		result = prime * result + ((telephone == null) ? 0 : telephone.hashCode());
+		result = prime * result + ((updateBy == null) ? 0 : updateBy.hashCode());
 		result = prime * result + ((updateTime == null) ? 0 : updateTime.hashCode());
 		return result;
 	}
@@ -143,7 +160,7 @@ public class Contact implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Contact other = (Contact) obj;
+		Vendor other = (Vendor) obj;
 		if (distributor == null) {
 			if (other.distributor != null)
 				return false;
@@ -174,6 +191,11 @@ public class Contact implements Serializable {
 				return false;
 		} else if (!telephone.equals(other.telephone))
 			return false;
+		if (updateBy == null) {
+			if (other.updateBy != null)
+				return false;
+		} else if (!updateBy.equals(other.updateBy))
+			return false;
 		if (updateTime == null) {
 			if (other.updateTime != null)
 				return false;
@@ -183,5 +205,4 @@ public class Contact implements Serializable {
 	}
 
 	
-
 }

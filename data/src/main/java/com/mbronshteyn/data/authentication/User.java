@@ -1,4 +1,4 @@
-package com.mbronshteyn.authentication.data;
+package com.mbronshteyn.data.authentication;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -3,9 +3,9 @@ package com.mbronshteyn.gameserver.services;
 
 import java.util.List;
 
-import com.mbronshteyn.gameserver.data.Contact;
-import com.mbronshteyn.gameserver.data.Distributor;
-import com.mbronshteyn.gameserver.data.Vendor;
+import com.mbronshteyn.data.vendor.Contact;
+import com.mbronshteyn.data.vendor.Distributor;
+import com.mbronshteyn.data.vendor.Vendor;
 import com.mbronshteyn.gameserver.dto.ContactDto;
 import com.mbronshteyn.gameserver.dto.DistributorDto;
 import com.mbronshteyn.gameserver.dto.VendorDto;

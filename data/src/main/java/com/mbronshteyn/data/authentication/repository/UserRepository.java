@@ -1,8 +1,8 @@
-package com.mbronshteyn.authentication.data.repository;
+package com.mbronshteyn.data.authentication.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.mbronshteyn.authentication.data.User;
+import com.mbronshteyn.data.authentication.User;
 
 public interface UserRepository extends JpaRepository<User, String>{
 	

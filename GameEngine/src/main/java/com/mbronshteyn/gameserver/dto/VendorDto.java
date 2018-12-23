@@ -1,6 +1,6 @@
 package com.mbronshteyn.gameserver.dto;
 
-import com.mbronshteyn.gameserver.data.Vendor;
+import com.mbronshteyn.data.vendor.Vendor;
 
 public class VendorDto {
 	

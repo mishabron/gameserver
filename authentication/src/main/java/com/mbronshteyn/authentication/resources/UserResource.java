@@ -13,9 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.mbronshteyn.authentication.data.User;
+import com.mbronshteyn.data.authentication.User;
 import com.mbronshteyn.authentication.dto.UserDto;
-import com.mbronshteyn.authentication.model.UserRoles;
 import com.mbronshteyn.authentication.services.UserService;
 
 @Component

@@ -24,8 +24,8 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
-import com.mbronshteyn.authentication.data.User;
-import com.mbronshteyn.authentication.data.repository.UserRepository;
+import com.mbronshteyn.data.authentication.User;
+import com.mbronshteyn.data.authentication.repository.UserRepository;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

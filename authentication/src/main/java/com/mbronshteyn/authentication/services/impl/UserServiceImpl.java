@@ -3,8 +3,8 @@ package com.mbronshteyn.authentication.services.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mbronshteyn.authentication.data.User;
-import com.mbronshteyn.authentication.data.repository.UserRepository;
+import com.mbronshteyn.data.authentication.User;
+import com.mbronshteyn.data.authentication.repository.UserRepository;
 import com.mbronshteyn.authentication.dto.UserDto;
 import com.mbronshteyn.authentication.services.UserService;
 

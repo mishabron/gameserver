@@ -1,4 +1,4 @@
-package com.mbronshteyn.gameserver.data;
+package com.mbronshteyn.data.vendor;
 
 import java.io.Serializable;
 import java.util.Date;

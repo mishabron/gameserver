@@ -4,30 +4,26 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.mbronshteyn.gameserver.data.Contact;
-import com.mbronshteyn.gameserver.data.Distributor;
-import com.mbronshteyn.gameserver.data.Vendor;
+import com.mbronshteyn.data.vendor.Contact;
+import com.mbronshteyn.data.vendor.Distributor;
+import com.mbronshteyn.data.vendor.Vendor;
 import com.mbronshteyn.gameserver.dto.ContactDto;
 import com.mbronshteyn.gameserver.dto.DistributorDto;
 import com.mbronshteyn.gameserver.dto.VendorDto;

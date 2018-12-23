@@ -1,6 +1,6 @@
 package com.mbronshteyn.gameserver.dto;
 
-import com.mbronshteyn.gameserver.data.Contact;
+import com.mbronshteyn.data.vendor.Contact;
 
 public class ContactDto {
 	
