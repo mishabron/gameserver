@@ -1,11 +1,14 @@
 package com.mbronshteyn.data.cards;
 
 import com.mbronshteyn.data.cards.keys.HitId;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 
 /**
@@ -15,29 +18,40 @@ import java.util.Objects;
 @Entity
 @Table(name="Hit")
 @NamedQuery(name="Hit.findAll", query="SELECT h FROM Hit h")
+@EntityListeners(AuditingEntityListener.class)
+@IdClass(HitId.class)
 public class Hit implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private HitId id;
+	@Id
+    @Column(name="Sequence", nullable=false)
+    private int sequence;
+
+    //bi-directional many-to-one association to Card
+    @Id
+    @ManyToOne
+    @JoinColumn(name="Card_id", referencedColumnName="id", nullable=false, insertable = false, updatable = false)
+    private Card card;
 
 	@Column(name="BonusHit")
 	private boolean bonusHit;
 
 	@Column(name="HtTime", nullable=false)
-	private Timestamp htTime;
+	@Temporal(TemporalType.TIMESTAMP)
+	@LastModifiedDate
+	private Date hitTime;
 
 	@Column(name="Number_1")
-	private int number_1;
+	private Integer number_1;
 
 	@Column(name="Number_2")
-	private int number_2;
+	private Integer number_2;
 
 	@Column(name="Number_3")
-	private int number_3;
+	private Integer number_3;
 
 	@Column(name="Number_4")
-	private int number_4;
+	private Integer number_4;
 
 	public Hit() {
 	}
@@ -50,74 +64,83 @@ public class Hit implements Serializable {
 		this.bonusHit = bonusHit;
 	}
 
-	public Timestamp getHtTime() {
-		return this.htTime;
+	public Date getHitTime() {
+		return this.hitTime;
 	}
 
-	public void setHtTime(Timestamp htTime) {
-		this.htTime = htTime;
+	public void setHitTime(Date hitTime) {
+		this.hitTime = hitTime;
 	}
 
-	public int getNumber_1() {
+	public Integer getNumber_1() {
 		return this.number_1;
 	}
 
-	public void setNumber_1(int number_1) {
+	public void setNumber_1(Integer number_1) {
 		this.number_1 = number_1;
 	}
 
-	public int getNumber_2() {
+	public Integer getNumber_2() {
 		return this.number_2;
 	}
 
-	public void setNumber_2(int number_2) {
+	public void setNumber_2(Integer number_2) {
 		this.number_2 = number_2;
 	}
 
-	public int getNumber_3() {
+	public Integer getNumber_3() {
 		return this.number_3;
 	}
 
-	public void setNumber_3(int number_3) {
+	public void setNumber_3(Integer number_3) {
 		this.number_3 = number_3;
 	}
 
-	public int getNumber_4() {
+	public Integer getNumber_4() {
 		return this.number_4;
 	}
 
-	public void setNumber_4(int number_4) {
+	public void setNumber_4(Integer number_4) {
 		this.number_4 = number_4;
-	}
-
-	public HitId getId() {
-		return id;
-	}
-
-	public void setId(HitId id) {
-		this.id = id;
 	}
 
 	public boolean isBonusHit() {
 		return bonusHit;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Hit hit = (Hit) o;
-		return bonusHit == hit.bonusHit &&
-				number_1 == hit.number_1 &&
-				number_2 == hit.number_2 &&
-				number_3 == hit.number_3 &&
-				number_4 == hit.number_4 &&
-				Objects.equals(id, hit.id) &&
-				Objects.equals(htTime, hit.htTime);
-	}
+    public int getSequence() {
+        return sequence;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, bonusHit, htTime, number_1, number_2, number_3, number_4);
-	}
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Hit hit = (Hit) o;
+        return bonusHit == hit.bonusHit &&
+                Objects.equals(sequence, hit.sequence) &&
+                Objects.equals(card.getBarcode(), hit.card.getBarcode()) &&
+                Objects.equals(hitTime, hit.hitTime) &&
+                Objects.equals(number_1, hit.number_1) &&
+                Objects.equals(number_2, hit.number_2) &&
+                Objects.equals(number_3, hit.number_3) &&
+                Objects.equals(number_4, hit.number_4);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sequence, card.getBarcode(), bonusHit, hitTime, number_1, number_2, number_3, number_4);
+    }
 }

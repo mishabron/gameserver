@@ -1,17 +1,19 @@
 package com.mbronshteyn.gameserver.dto;
 
-import javax.persistence.Column;
 import java.math.BigDecimal;
 
 public class BatchDto {
 
     private String gameName;
-    private int cards;
+    private int numberOfCards;
     private BigDecimal cardPrice;
     private byte freeGame;
     private BigDecimal payout1;
     private BigDecimal payout2;
     private BigDecimal payout3;
+    private int numberOfBonusPins;
+    private int numberOfBooserPins;
+    private int numberOfSuperPins;
 
     public String getGameName() {
         return gameName;
@@ -21,12 +23,12 @@ public class BatchDto {
         this.gameName = gameName;
     }
 
-    public int getCards() {
-        return cards;
+    public int getNumberOfCards() {
+        return numberOfCards;
     }
 
-    public void setCards(int cards) {
-        this.cards = cards;
+    public void setNumberOfCards(int numberOfCards) {
+        this.numberOfCards = numberOfCards;
     }
 
     public BigDecimal getCardPrice() {
@@ -67,5 +69,29 @@ public class BatchDto {
 
     public void setPayout3(BigDecimal payout3) {
         this.payout3 = payout3;
+    }
+
+    public int getNumberOfBonusPins() {
+        return numberOfBonusPins;
+    }
+
+    public void setNumberOfBonusPins(int numberOfBonusPins) {
+        this.numberOfBonusPins = numberOfBonusPins;
+    }
+
+    public int getNumberOfBooserPins() {
+        return numberOfBooserPins;
+    }
+
+    public void setNumberOfBooserPins(int numberOfBooserPins) {
+        this.numberOfBooserPins = numberOfBooserPins;
+    }
+
+    public int getNumberOfSuperPins() {
+        return numberOfSuperPins;
+    }
+
+    public void setNumberOfSuperPins(int numberOfSuperPins) {
+        this.numberOfSuperPins = numberOfSuperPins;
     }
 }

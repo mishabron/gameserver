@@ -2,32 +2,25 @@ package com.mbronshteyn.data.cards.keys;
 
 import com.mbronshteyn.data.cards.Card;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Embeddable
+@IdClass(HitId.class)
 public class HitId implements Serializable {
 
     public HitId() {
     }
 
-    @Column(name="Sequence", nullable=false)
-    private int sequence;
+    private Integer sequence;
 
-    //bi-directional many-to-one association to Card
-    @ManyToOne
-    @JoinColumn(name="Card_id", referencedColumnName="id", nullable=false)
     private Card card;
 
-    public int getSequence() {
+    public Integer getSequence() {
         return sequence;
     }
 
-    public void setSequence(int sequence) {
+    public void setSequence(Integer sequence) {
         this.sequence = sequence;
     }
 

@@ -39,7 +39,7 @@ public class CardsResource {
     @POST
     @Path("/generate")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Genarate Cards", notes="Generate Cards for the Batch.")
+    @ApiOperation(value = "Genarate Cards", notes="Generate Cards for the CardBatch.")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Card generation", response = String.class)})
     public Response generateCards(@ApiParam(name = "batch", value = "new batch", required = true) BatchDto batch) {
 

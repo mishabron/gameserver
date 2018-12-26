@@ -1,21 +1,27 @@
 package com.mbronshteyn.data.cards;
 
-import java.io.Serializable;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 
 /**
- * The persistent class for the Batch database table.
+ * The persistent class for the CardBatch database table.
  * 
  */
 @Entity
-@Table(name="Batch")
-@NamedQuery(name="Batch.findAll", query="SELECT b FROM Batch b")
-public class Batch implements Serializable {
+@Table(name="CardBatch")
+@NamedQuery(name="CardBatch.findAll", query="SELECT b FROM CardBatch b")
+@EntityListeners(AuditingEntityListener.class)
+public class CardBatch implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -27,7 +33,8 @@ public class Batch implements Serializable {
 	private String barcode;
 
 	@Column(name="Batchdate", nullable=false)
-	private Timestamp batchdate;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date batchdate;
 
 	@Column(name="CardPrice", precision=10, scale=2)
 	private BigDecimal cardPrice;
@@ -51,29 +58,32 @@ public class Batch implements Serializable {
 	private BigDecimal payout3;
 
 	@Column(name="UpdateBy", length=10)
+	@LastModifiedBy
 	private String updateBy;
 
 	@Column(name="UpdateTime")
-	private Timestamp updateTime;
+	@Temporal(TemporalType.TIMESTAMP)
+	@LastModifiedDate
+	private Date updateTime;
 
 	@Column(name="Userid", length=10)
 	private String userid;
 
 	//bi-directional many-to-one association to BonusPin
-	@OneToMany(mappedBy="batch")
-	private Set<BonusPin> bonusPins;
+	@OneToMany(mappedBy="id.batch",fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private Set<BonusPin> bonusPins = new HashSet<>();;
 
 	//bi-directional many-to-one association to BoosterPin
-	@OneToMany(mappedBy="batch")
-	private Set<BoosterPin> boosterPins;
+	@OneToMany(mappedBy="id.batch",fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private Set<BoosterPin> boosterPins = new HashSet<>();;
 
 	//bi-directional many-to-one association to Card
-	@OneToMany(mappedBy="batch", cascade={CascadeType.PERSIST, CascadeType.REMOVE})
-	private Set<Card> cards;
+	@OneToMany(mappedBy="batch", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private Set<Card> cards = new HashSet<>();;
 
 	//bi-directional many-to-one association to SuperPin
-	@OneToMany(mappedBy="batch")
-	private Set<SuperPin> superPins;
+	@OneToMany(mappedBy="id.batch",fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private Set<SuperPin> superPins = new HashSet<>();;
 
 	public int getId() {
 		return id;
@@ -83,7 +93,7 @@ public class Batch implements Serializable {
 		this.id = id;
 	}
 
-	public Batch() {
+	public CardBatch() {
 	}
 
 	public String getBarcode() {
@@ -94,11 +104,11 @@ public class Batch implements Serializable {
 		this.barcode = barcode;
 	}
 
-	public Timestamp getBatchdate() {
+	public Date getBatchdate() {
 		return this.batchdate;
 	}
 
-	public void setBatchdate(Timestamp batchdate) {
+	public void setBatchdate(Date batchdate) {
 		this.batchdate = batchdate;
 	}
 
@@ -166,11 +176,11 @@ public class Batch implements Serializable {
 		this.updateBy = updateBy;
 	}
 
-	public Timestamp getUpdateTime() {
+	public Date getUpdateTime() {
 		return this.updateTime;
 	}
 
-	public void setUpdateTime(Timestamp updateTime) {
+	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
 
@@ -274,28 +284,28 @@ public class Batch implements Serializable {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		Batch batch = (Batch) o;
-		return id == batch.id &&
-				cardsInBatch == batch.cardsInBatch &&
-				freeGame == batch.freeGame &&
-				game_id == batch.game_id &&
-				Objects.equals(barcode, batch.barcode) &&
-				Objects.equals(batchdate, batch.batchdate) &&
-				Objects.equals(cardPrice, batch.cardPrice) &&
-				Objects.equals(payout1, batch.payout1) &&
-				Objects.equals(payout2, batch.payout2) &&
-				Objects.equals(payout3, batch.payout3) &&
-				Objects.equals(updateBy, batch.updateBy) &&
-				Objects.equals(updateTime, batch.updateTime) &&
-				Objects.equals(userid, batch.userid) &&
-				Objects.equals(bonusPins, batch.bonusPins) &&
-				Objects.equals(boosterPins, batch.boosterPins) &&
-				Objects.equals(cards, batch.cards) &&
-				Objects.equals(superPins, batch.superPins);
+		CardBatch cardBatch = (CardBatch) o;
+		return id == cardBatch.id &&
+				cardsInBatch == cardBatch.cardsInBatch &&
+				freeGame == cardBatch.freeGame &&
+				game_id == cardBatch.game_id &&
+				Objects.equals(barcode, cardBatch.barcode) &&
+				Objects.equals(batchdate, cardBatch.batchdate) &&
+				Objects.equals(cardPrice, cardBatch.cardPrice) &&
+				Objects.equals(payout1, cardBatch.payout1) &&
+				Objects.equals(payout2, cardBatch.payout2) &&
+				Objects.equals(payout3, cardBatch.payout3) &&
+				Objects.equals(updateBy, cardBatch.updateBy) &&
+				Objects.equals(updateTime, cardBatch.updateTime) &&
+				Objects.equals(userid, cardBatch.userid) &&
+				Objects.equals(bonusPins, cardBatch.bonusPins) &&
+				Objects.equals(boosterPins, cardBatch.boosterPins) &&
+				Objects.equals(cards, cardBatch.cards) &&
+				Objects.equals(superPins, cardBatch.superPins);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, barcode, batchdate, cardPrice, cardsInBatch, freeGame, game_id, payout1, payout2, payout3, updateBy, updateTime, userid, bonusPins, boosterPins, cards, superPins);
+		return Objects.hash(id, barcode, batchdate, cardPrice, cardsInBatch, freeGame, game_id, payout1, payout2, payout3, updateBy, updateTime, userid);
 	}
 }

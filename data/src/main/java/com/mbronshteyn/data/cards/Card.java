@@ -1,8 +1,13 @@
 package com.mbronshteyn.data.cards;
 
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -14,6 +19,7 @@ import java.util.Set;
 @Entity
 @Table(name="Cards")
 @NamedQuery(name="Card.findAll", query="SELECT c FROM Card c")
+@EntityListeners(AuditingEntityListener.class)
 public class Card implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -32,7 +38,7 @@ public class Card implements Serializable {
 	private String barcode;
 
 	@Column(name="card_number", nullable=false, length=12)
-	private String cardNumber;
+	private Long cardNumber;
 
 	@Column(name="Email", length=45)
 	private String email;
@@ -49,20 +55,25 @@ public class Card implements Serializable {
 	@Column(name="UpdateBy", length=10)
 	private String updateBy;
 
+	@Column(name="NumberOfHits")
+	private int numberOfHits;
+
 	@Column(name="UpdateTime")
-	private Timestamp updateTime;
+	@Temporal(TemporalType.TIMESTAMP)
+	@LastModifiedDate
+	private Date updateTime;
 
 	@Column(name="WinPin")
-	private int winPin;
+	private String winPin;
 
-	//bi-directional many-to-one association to Batch
-	@ManyToOne
+	//bi-directional many-to-one association to CardBatch
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="Batch_id", referencedColumnName="id")
-	private Batch batch;
+	private CardBatch batch;
 
 	//bi-directional many-to-one association to Hit
-	@OneToMany(mappedBy="card")
-	private Set<Hit> hits;
+	@OneToMany(mappedBy="card",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
+	private Set<Hit> hits = new HashSet<>();
 	
 	public int getId() {
 		return id;
@@ -99,11 +110,11 @@ public class Card implements Serializable {
 		this.barcode = barcode;
 	}
 
-	public String getCardNumber() {
+	public Long getCardNumber() {
 		return this.cardNumber;
 	}
 
-	public void setCardNumber(String cardNumber) {
+	public void setCardNumber(Long cardNumber) {
 		this.cardNumber = cardNumber;
 	}
 
@@ -147,27 +158,27 @@ public class Card implements Serializable {
 		this.updateBy = updateBy;
 	}
 
-	public Timestamp getUpdateTime() {
+	public Date getUpdateTime() {
 		return this.updateTime;
 	}
 
-	public void setUpdateTime(Timestamp updateTime) {
+	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
 
-	public int getWinPin() {
+	public String getWinPin() {
 		return this.winPin;
 	}
 
-	public void setWinPin(int winPin) {
+	public void setWinPin(String winPin) {
 		this.winPin = winPin;
 	}
 
-	public Batch getBatch() {
+	public CardBatch getBatch() {
 		return this.batch;
 	}
 
-	public void setBatch(Batch batch) {
+	public void setBatch(CardBatch batch) {
 		this.batch = batch;
 	}
 
@@ -179,17 +190,38 @@ public class Card implements Serializable {
 		this.hits = hits;
 	}
 
-	public Hit addHit(Hit hit) {
-		getHits().add(hit);
-		hit.getId().setCard(this);
+	public boolean isActive() {
+		return active;
+	}
 
+	public boolean isPaid() {
+		return paid;
+	}
+
+	public boolean isPlayed() {
+		return played;
+	}
+
+	public int getNumberOfHits() {
+		return numberOfHits;
+	}
+
+	public void setNumberOfHits(int numberOfHits) {
+		this.numberOfHits = numberOfHits;
+	}
+
+	public Hit addHit(Hit hit) {
+		numberOfHits = numberOfHits +1;
+		hit.setCard(this);
+		hit.setSequence(numberOfHits);
+		getHits().add(hit);
 		return hit;
 	}
 
 	public Hit removeHit(Hit hit) {
 		getHits().remove(hit);
-		hit.getId().setCard(null);
-
+		hit.setCard(null);
+		numberOfHits = numberOfHits -1;
 		return hit;
 	}
 
@@ -216,6 +248,6 @@ public class Card implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, activateDate, active, barcode, cardNumber, email, game_id, paid, played, updateBy, updateTime, winPin, batch, hits);
+		return Objects.hash(id, activateDate, active, barcode, cardNumber, email, game_id, paid, played, updateBy, updateTime, winPin);
 	}
 }
