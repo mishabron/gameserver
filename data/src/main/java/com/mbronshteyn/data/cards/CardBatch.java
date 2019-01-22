@@ -241,6 +241,7 @@ public class CardBatch implements Serializable {
 	}
 
 	public void setCards(Set<Card> cards) {
+
 		this.cards = cards;
 	}
 
@@ -297,11 +298,7 @@ public class CardBatch implements Serializable {
 				Objects.equals(payout3, cardBatch.payout3) &&
 				Objects.equals(updateBy, cardBatch.updateBy) &&
 				Objects.equals(updateTime, cardBatch.updateTime) &&
-				Objects.equals(userid, cardBatch.userid) &&
-				Objects.equals(bonusPins, cardBatch.bonusPins) &&
-				Objects.equals(boosterPins, cardBatch.boosterPins) &&
-				Objects.equals(cards, cardBatch.cards) &&
-				Objects.equals(superPins, cardBatch.superPins);
+				Objects.equals(userid, cardBatch.userid);
 	}
 
 	@Override

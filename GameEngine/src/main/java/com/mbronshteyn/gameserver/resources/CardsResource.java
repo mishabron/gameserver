@@ -1,5 +1,8 @@
 package com.mbronshteyn.gameserver.resources;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.dto.BatchDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.CardService;
@@ -7,8 +10,10 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.HttpHeaders;
@@ -35,6 +40,9 @@ public class CardsResource {
     @Autowired
     CardService distributorService;
 
+    @Resource
+    SecurityUser securityUser;
+
 
     @POST
     @Path("/generate")
@@ -44,6 +52,10 @@ public class CardsResource {
     public Response generateCards(@ApiParam(name = "batch", value = "new batch", required = true) BatchDto batch) {
 
         try {
+
+            DecodedJWT token = JWT.decode(jwt);
+            securityUser.setUser(token.getSubject());
+
             distributorService.generateCardsForBatch(batch);
             return Response.ok().build();
 

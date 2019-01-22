@@ -1,10 +1,12 @@
 package com.mbronshteyn.data.cards;
 
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
@@ -40,6 +42,9 @@ public class Card implements Serializable {
 	@Column(name="card_number", nullable=false, length=12)
 	private Long cardNumber;
 
+	@Column(name="Prise", precision=10, scale=2)
+	private BigDecimal price;
+
 	@Column(name="Email", length=45)
 	private String email;
 
@@ -53,10 +58,14 @@ public class Card implements Serializable {
 	private boolean played;
 
 	@Column(name="UpdateBy", length=10)
+	@LastModifiedBy
 	private String updateBy;
 
 	@Column(name="NumberOfHits")
 	private int numberOfHits;
+
+	@Column(name="DeviceId", length=20)
+	private String deviceId;
 
 	@Column(name="UpdateTime")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -74,7 +83,10 @@ public class Card implements Serializable {
 	//bi-directional many-to-one association to Hit
 	@OneToMany(mappedBy="card",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
 	private Set<Hit> hits = new HashSet<>();
-	
+
+	@Column(name="ActivateBy", length=45)
+	private String activateBy;
+
 	public int getId() {
 		return id;
 	}
@@ -208,6 +220,30 @@ public class Card implements Serializable {
 
 	public void setNumberOfHits(int numberOfHits) {
 		this.numberOfHits = numberOfHits;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public String getActivateBy() {
+		return activateBy;
+	}
+
+	public void setActivateBy(String activateBy) {
+		this.activateBy = activateBy;
 	}
 
 	public Hit addHit(Hit hit) {
