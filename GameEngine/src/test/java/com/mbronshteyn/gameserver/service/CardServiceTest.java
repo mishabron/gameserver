@@ -1,6 +1,5 @@
 package com.mbronshteyn.gameserver.service;
 
-import com.auth0.jwt.JWT;
 import com.mbronshteyn.data.cards.Card;
 import com.mbronshteyn.data.cards.CardBatch;
 import com.mbronshteyn.data.cards.Game;
@@ -8,9 +7,8 @@ import com.mbronshteyn.data.cards.repository.CardBatchRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.audit.GameAuditorConfig;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
-import com.mbronshteyn.gameserver.dto.BatchDto;
+import com.mbronshteyn.gameserver.dto.card.BatchDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
-import com.mbronshteyn.gameserver.services.CardService;
 import com.mbronshteyn.gameserver.services.impl.CardServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -87,9 +85,28 @@ public class CardServiceTest {
     }
 
     @Test
-    @Transactional
-    public void testBatc() throws GameServerException {
+    public void testBatch() throws GameServerException {
         CardBatch testBatch = cardBatchRepository.findByBarcode(barcode);
         Set<Card> cards = testBatch.getCards();
+    }
+
+    @Test
+    public void testActivateCard() throws GameServerException {
+
+        CardBatch testBatch = cardBatchRepository.findByBarcode(barcode);
+        Set<Card> cards = testBatch.getCards();
+
+        Card card = cards.stream().findFirst().get();
+        Assert.assertTrue(!card.isActive());
+
+        String bardcode = card.getBarcode();
+        Card activeCard = cardService.activateCard(bardcode);
+        Assert.assertTrue(activeCard.isActive());
+
+    }
+
+    @Test
+    public void testActivateBatch() throws GameServerException {
+        CardBatch testBatch = cardService.activateBatch(barcode);
     }
 }

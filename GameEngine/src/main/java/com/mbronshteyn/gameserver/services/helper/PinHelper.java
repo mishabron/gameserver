@@ -76,7 +76,7 @@ public class PinHelper {
             Card card = new Card();
             card.setCardNumber(cardNUmber);
             card.setBarcode(RandomStringUtils.randomAlphanumeric(7));
-            card.setGame_id(batch.getGame_id());
+            card.setGameId(batch.getGame_id());
             card.setBatch(batch);
             card.setActive(false);
             card.setPlayed(false);

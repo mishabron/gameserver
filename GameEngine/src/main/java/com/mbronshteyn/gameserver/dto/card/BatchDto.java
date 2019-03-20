@@ -1,4 +1,4 @@
-package com.mbronshteyn.gameserver.dto;
+package com.mbronshteyn.gameserver.dto.card;
 
 import java.math.BigDecimal;
 

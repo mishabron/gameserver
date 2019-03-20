@@ -4,8 +4,10 @@ import com.mbronshteyn.data.cards.Card;
 import com.mbronshteyn.data.cards.CardBatch;
 import com.mbronshteyn.data.cards.Game;
 import com.mbronshteyn.data.cards.repository.CardBatchRepository;
+import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
-import com.mbronshteyn.gameserver.dto.BatchDto;
+import com.mbronshteyn.gameserver.audit.SecurityUser;
+import com.mbronshteyn.gameserver.dto.card.BatchDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.CardService;
 import com.mbronshteyn.gameserver.services.helper.PinHelper;
@@ -32,6 +34,12 @@ public class CardServiceImpl implements CardService {
     @Autowired
     GameRepository gameRepository;
 
+    @Autowired
+    CardRepository cardRepository;
+
+    @Autowired
+    SecurityUser securityUser;
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
@@ -76,4 +84,51 @@ public class CardServiceImpl implements CardService {
         return storedBatch;
 
     }
+
+    @Override
+    @Transactional
+    public Card activateCard(String barcode) throws GameServerException {
+        
+        //get a card by barcode #
+        Card card = cardRepository.findByBarcode(barcode);
+        if(card == null){
+            throw new GameServerException("Card not found");
+        }
+        if(card.isActive()){
+            throw new GameServerException("Card is already active");
+        }
+        if(card.isPlayed()){
+            throw new GameServerException("Card has been played already");
+        }
+
+        card.setActive(true);
+        card.setWinPin(RandomStringUtils.randomNumeric(4));
+        card.setActivateDate(new Date());
+        card.setActivateBy(securityUser.getUser());
+
+        card = cardRepository.save(card);
+
+        return card;
+    }
+
+    @Override
+    @Transactional
+    public CardBatch activateBatch(String barcode) throws GameServerException {
+
+        //get a card by barcode #
+        Card firstCard = cardRepository.findByBarcode(barcode);
+
+        CardBatch batch = firstCard.getBatch();
+
+        if(batch == null){
+            throw new GameServerException("Batch not found");
+        }
+
+        for(Card card: batch.getCards()){
+            activateCard(card.getBarcode());
+        }
+
+        return batch;
+    }
+
 }

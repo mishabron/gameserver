@@ -4,6 +4,7 @@ import com.mbronshteyn.authentication.security.binding.AuthinticationDynamicFeat
 import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.resources.CardsResource;
 import com.mbronshteyn.gameserver.resources.DistributorResource;
+import com.mbronshteyn.gameserver.resources.GameResource;
 import com.mbronshteyn.gameserver.resources.HeartBeatResource;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -47,9 +48,10 @@ public class GameEngineApplication extends ResourceConfig{
 		register(DistributorResource.class); 
 		register(HeartBeatResource.class);
 		register(CardsResource.class);
+		register(GameResource.class);
 
 		register(RolesAllowedDynamicFeature.class);
-		register(AuthinticationDynamicFeature.class);  		
+		register(AuthinticationDynamicFeature.class);
 
 	}
 

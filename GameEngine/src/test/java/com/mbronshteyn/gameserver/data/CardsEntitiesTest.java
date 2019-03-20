@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -112,7 +111,7 @@ public class CardsEntitiesTest {
         Card card = new Card();
         card.setCardNumber(Long.parseLong(RandomStringUtils.randomNumeric(12)));
         card.setBarcode(RandomStringUtils.randomAlphanumeric(7));
-        card.setGame_id(storedGame.getId());
+        card.setGameId(storedGame.getId());
         card.setWinPin(RandomStringUtils.randomNumeric(4));
         batch.addCard(card);
 

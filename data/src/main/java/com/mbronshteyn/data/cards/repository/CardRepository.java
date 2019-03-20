@@ -15,4 +15,6 @@ public interface CardRepository extends JpaRepository<Card, BigInteger> {
 
     public Card findByCardNumber(Long cardNumber);
 
+    public Card findByCardNumberAndGameId(Long cardNumber, int gameId);
+
 }

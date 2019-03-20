@@ -1,13 +1,12 @@
 package com.mbronshteyn.data.cards;
 
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -31,7 +30,8 @@ public class Card implements Serializable {
 	private int id;
 	
 	@Column(name="ActivateDate")
-	private Timestamp activateDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date activateDate;
 
 	@Column(name="Active")
 	private boolean active;
@@ -42,14 +42,14 @@ public class Card implements Serializable {
 	@Column(name="card_number", nullable=false, length=12)
 	private Long cardNumber;
 
-	@Column(name="Prise", precision=10, scale=2)
+	@Column(name="Price", precision=10, scale=2)
 	private BigDecimal price;
 
 	@Column(name="Email", length=45)
 	private String email;
 
 	@Column(name="Game_id", nullable=false)
-	private int game_id;
+	private int gameId;
 
 	@Column(name="Paid")
 	private boolean paid;
@@ -58,8 +58,8 @@ public class Card implements Serializable {
 	private boolean played;
 
 	@Column(name="UpdateBy", length=10)
-	@LastModifiedBy
-	private String updateBy;
+	@CreatedBy
+	private String createdBy;
 
 	@Column(name="NumberOfHits")
 	private int numberOfHits;
@@ -69,8 +69,8 @@ public class Card implements Serializable {
 
 	@Column(name="UpdateTime")
 	@Temporal(TemporalType.TIMESTAMP)
-	@LastModifiedDate
-	private Date updateTime;
+	@CreatedDate
+	private Date createTime;
 
 	@Column(name="WinPin")
 	private String winPin;
@@ -98,11 +98,11 @@ public class Card implements Serializable {
 	public Card() {
 	}
 
-	public Timestamp getActivateDate() {
+	public Date getActivateDate() {
 		return this.activateDate;
 	}
 
-	public void setActivateDate(Timestamp activateDate) {
+	public void setActivateDate(Date activateDate) {
 		this.activateDate = activateDate;
 	}
 
@@ -138,12 +138,12 @@ public class Card implements Serializable {
 		this.email = email;
 	}
 
-	public int getGame_id() {
-		return this.game_id;
+	public int getGameId() {
+		return this.gameId;
 	}
 
-	public void setGame_id(int game_id) {
-		this.game_id = game_id;
+	public void setGameId(int gameId) {
+		this.gameId = gameId;
 	}
 
 	public boolean getPaid() {
@@ -162,20 +162,20 @@ public class Card implements Serializable {
 		this.played = played;
 	}
 
-	public String getUpdateBy() {
-		return this.updateBy;
+	public String getCreatedBy() {
+		return this.createdBy;
 	}
 
-	public void setUpdateBy(String updateBy) {
-		this.updateBy = updateBy;
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
 	}
 
-	public Date getUpdateTime() {
-		return this.updateTime;
+	public Date getCreateTime() {
+		return this.createTime;
 	}
 
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
 	public String getWinPin() {
@@ -268,7 +268,7 @@ public class Card implements Serializable {
 		Card card = (Card) o;
 		return id == card.id &&
 				active == card.active &&
-				game_id == card.game_id &&
+				gameId == card.gameId &&
 				paid == card.paid &&
 				played == card.played &&
 				winPin == card.winPin &&
@@ -276,14 +276,14 @@ public class Card implements Serializable {
 				Objects.equals(barcode, card.barcode) &&
 				Objects.equals(cardNumber, card.cardNumber) &&
 				Objects.equals(email, card.email) &&
-				Objects.equals(updateBy, card.updateBy) &&
-				Objects.equals(updateTime, card.updateTime) &&
+				Objects.equals(createdBy, card.createdBy) &&
+				Objects.equals(createTime, card.createTime) &&
 				Objects.equals(batch, card.batch) &&
 				Objects.equals(hits, card.hits);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, activateDate, active, barcode, cardNumber, email, game_id, paid, played, updateBy, updateTime, winPin);
+		return Objects.hash(id, activateDate, active, barcode, cardNumber, email, gameId, paid, played, createdBy, createTime, winPin);
 	}
 }
