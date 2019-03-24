@@ -28,6 +28,7 @@
         <module>data</module>
         <module>authentication</module>
         <module>GameEngine</module>
+        <module>contract</module>
     </modules>
 
     <dependencies>
@@ -42,5 +43,20 @@
             <artifactId>spring-boot-starter-jersey</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.spotify/docker-maven-plugin -->
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
+
+
 </project>

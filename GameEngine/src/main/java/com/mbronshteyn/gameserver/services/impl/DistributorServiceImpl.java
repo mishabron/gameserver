@@ -10,6 +10,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.mbronshteyn.gameserver.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -151,7 +152,7 @@ public class DistributorServiceImpl implements  DistributorService{
 		
 		Response response = client.target(AUTH_URI).request(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, jwt).post(Entity.entity(user, MediaType.APPLICATION_JSON));
 		if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-			throw new GameServerException("Exception creating user ",response.getStatus());			
+			throw new GameServerException("Exception creating user ",response.getStatus(), ErrorCode.SERVERERROR);
 		}		
 	}
 

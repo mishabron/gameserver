@@ -87,6 +87,11 @@
 			<artifactId>data</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.mbronshteyn</groupId>
+			<artifactId>contract</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-client -->
 		<dependency>
@@ -119,7 +124,7 @@
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>				
+				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		    <plugin>
 		      <groupId>com.spotify</groupId>
@@ -129,7 +134,7 @@
 		        <imageName>gameserver</imageName>
 		        <baseImage>java:openjdk-8-jdk-alpine</baseImage>
 		        <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
-		        <!-- copy the service's jar file from target into the root directory of the image --> 
+		        <!-- copy the service's jar file from target into the root directory of the image -->
 		        <resources>
 		           <resource>
 		             <targetPath>/</targetPath>
@@ -138,9 +143,9 @@
 		           </resource>
 		        </resources>
 		      </configuration>
-		    </plugin>			
+		    </plugin>
 		</plugins>
-		
+
 	</build>
 
 

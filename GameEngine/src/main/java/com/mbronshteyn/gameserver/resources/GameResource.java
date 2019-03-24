@@ -42,7 +42,7 @@ public class GameResource {
             return gameService.logingCard(authDto);
         } catch (GameServerException e) {
             LOGGER.error("Card is not authinticated");
-            Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode","").build();
+            Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
             throw new WebApplicationException(response);
         }
     }

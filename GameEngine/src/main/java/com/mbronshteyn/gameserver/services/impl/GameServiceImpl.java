@@ -7,6 +7,7 @@ import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.dto.game.CardDto;
 import com.mbronshteyn.gameserver.dto.game.HitDto;
+import com.mbronshteyn.gameserver.exception.ErrorCode;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.GameService;
 import org.apache.commons.lang.StringUtils;
@@ -37,9 +38,13 @@ public class GameServiceImpl implements GameService {
 
         //validate card
         if(card  == null){
-            throw new GameServerException("Card# Is Invalid",500);
+            throw new GameServerException("Card# Is Invalid",500, ErrorCode.INVALID);
         } else if(StringUtils.isNotEmpty(card.getDeviceId()) && !card.getDeviceId().equals(authDto.getDeviceId())){
-            throw new GameServerException("Card is used by another device",500);
+            throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
+        }else if(!card.isActive()){
+            throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
+        }else if(!card.isPlayed()){
+            throw new GameServerException("Card is played already",500,ErrorCode.PLAID);
         }
 
         //record device id

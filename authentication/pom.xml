@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.mbronshteyn</groupId>
@@ -62,9 +62,9 @@
 
 		<!-- https://mvnrepository.com/artifact/com.spotify/docker-maven-plugin -->
 		<dependency>
-		    <groupId>com.spotify</groupId>
-		    <artifactId>docker-maven-plugin</artifactId>
-		    <version>1.0.0</version>
+			<groupId>com.spotify</groupId>
+			<artifactId>docker-maven-plugin</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.github.ulisesbocchio/jasypt-spring-boot-starter -->
@@ -92,26 +92,57 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-		    <plugin>
-		      <groupId>com.spotify</groupId>
-		      <artifactId>docker-maven-plugin</artifactId>
-		      <version>1.0.0</version>
-		      <configuration>
-		        <imageName>auth</imageName>
-		        <baseImage>java:openjdk-8-jdk-alpine</baseImage>
-		        <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
-		        <!-- copy the service's jar file from target into the root directory of the image --> 
-		        <resources>
-		           <resource>
-		             <targetPath>/</targetPath>
-		             <directory>${project.build.directory}</directory>
-		             <include>${project.build.finalName}.jar</include>
-		           </resource>
-		        </resources>
-		      </configuration>
-		    </plugin>				
+
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<imageName>mbronshteyn/${project.artifactId}</imageName>
+					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
+					<entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+					<!-- copy the service's jar file from target into the root directory of the image -->
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+					<serverId>docker-hub</serverId>
+					<registryUrl>https://registry-1.docker.io/v2/</registryUrl>
+				</configuration>
+				<executions>
+					<execution>
+						<id>tag-image-version</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>tag</goal>
+						</goals>
+						<configuration>
+							<image>mbronshteyn/${project.artifactId}</image>
+							<newName>mbronshteyn/${project.artifactId}:${project.version}</newName>
+							<serverId>docker-hub</serverId>
+							<pushImage>true</pushImage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>tag-image-latest</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>tag</goal>
+						</goals>
+						<configuration>
+							<image>mbronshteyn/${project.artifactId}</image>
+							<newName>mbronshteyn/${project.artifactId}:latest</newName>
+							<serverId>docker-hub</serverId>
+							<pushImage>true</pushImage>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
-
 
 </project>
