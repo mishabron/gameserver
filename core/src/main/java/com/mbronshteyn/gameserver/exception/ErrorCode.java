@@ -5,6 +5,6 @@ public enum ErrorCode {
     INVALID,
     INUSE,
     NOTACTIVE,
-    PLAID,
+    PLAYED,
     SERVERERROR
 }

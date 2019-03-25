@@ -43,7 +43,7 @@ public class GameServiceImpl implements GameService {
             throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
         }else if(!card.isActive()){
             throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
-        }else if(!card.isPlayed()){
+        }else if(card.isPlayed()){
             throw new GameServerException("Card is played already",500,ErrorCode.PLAID);
         }
 
