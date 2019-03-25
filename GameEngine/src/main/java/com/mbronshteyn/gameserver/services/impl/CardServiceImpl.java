@@ -118,6 +118,10 @@ public class CardServiceImpl implements CardService {
         //get a card by barcode #
         Card firstCard = cardRepository.findByBarcode(barcode);
 
+        if(firstCard == null){
+            throw new GameServerException("Card not found");
+        }
+
         CardBatch batch = firstCard.getBatch();
 
         if(batch == null){
