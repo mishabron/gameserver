@@ -44,7 +44,7 @@ public class GameServiceImpl implements GameService {
         }else if(!card.isActive()){
             throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
         }else if(card.isPlayed()){
-            throw new GameServerException("Card is played already",500,ErrorCode.PLAID);
+            throw new GameServerException("Card is played already",500,ErrorCode.PLAYED);
         }
 
         //record device id
