@@ -7,6 +7,7 @@ import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.dto.game.CardDto;
 import com.mbronshteyn.gameserver.dto.game.HitDto;
+import com.mbronshteyn.gameserver.dto.game.PinNumber;
 import com.mbronshteyn.gameserver.exception.ErrorCode;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.GameService;
@@ -53,6 +54,13 @@ public class GameServiceImpl implements GameService {
             cardRepository.save(card);
         }
 
+        CardDto cardDto = mapToCardDto(card, game);
+
+        return cardDto;
+    }
+
+    private CardDto mapToCardDto(Card card, Game game){
+
         CardDto cardDto = new CardDto();
 
         cardDto.setCardNumber(card.getCardNumber());
@@ -70,14 +78,29 @@ public class GameServiceImpl implements GameService {
             HitDto hitDto = new HitDto();
             hitDto.setSequence(hit.getSequence());
             hitDto.setBonusHit(hit.isBonusHit());
-            hitDto.setNumber_1(hit.getNumber_1());
-            hitDto.setNumber_2(hit.getNumber_2());
-            hitDto.setNumber_3(hit.getNumber_3());
-            hitDto.setNumber_4(hit.getNumber_4());
+
+            PinNumber pinNumber1 = new PinNumber();
+            pinNumber1.setNumber(hit.getNumber_1());
+            pinNumber1.setGuessed(hit.getNumber_1().equals(Integer.parseInt(card.getWinPin().substring(0,1))));
+            hitDto.setNumber_1(pinNumber1);
+
+            PinNumber pinNumber2 = new PinNumber();
+            pinNumber2.setNumber(hit.getNumber_2());
+            pinNumber2.setGuessed(hit.getNumber_2().equals(Integer.parseInt(card.getWinPin().substring(1,1))));
+            hitDto.setNumber_2(pinNumber2);
+
+            PinNumber pinNumber3 = new PinNumber();
+            pinNumber3.setNumber(hit.getNumber_3());
+            pinNumber3.setGuessed(hit.getNumber_3().equals(Integer.parseInt(card.getWinPin().substring(2,1))));
+            hitDto.setNumber_3(pinNumber3);
+
+            PinNumber pinNumber4 = new PinNumber();
+            pinNumber4.setNumber(hit.getNumber_4());
+            pinNumber4.setGuessed(hit.getNumber_4().equals(Integer.parseInt(card.getWinPin().substring(3,1))));
+            hitDto.setNumber_4(pinNumber4);
 
             hits.add(hitDto);
         }
-
         return cardDto;
     }
 }
