@@ -20,4 +20,5 @@ public class PinNumber {
     public void setGuessed(boolean guessed) {
         this.guessed = guessed;
     }
+
 }

@@ -11,6 +11,7 @@ public class CardDto {
     int numberOfHits;
     List<HitDto> hits;
     String game;
+    double balance;
 
     public Long getCardNumber() {
         return cardNumber;
@@ -66,5 +67,13 @@ public class CardDto {
 
     public void setHits(List<HitDto> hits) {
         this.hits = hits;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 }
