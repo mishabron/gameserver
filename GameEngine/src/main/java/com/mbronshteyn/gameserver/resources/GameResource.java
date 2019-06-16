@@ -64,4 +64,21 @@ public class GameResource {
             throw new WebApplicationException(response);
         }
     }
+
+    @POST
+    @Path("/hit")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @ApiOperation(value = "Winning Pin", notes="Get Winning Pin")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Winning Pin is read", response = CardDto.class)})
+    public String getWinningPin(@ApiParam(name = "hitCard", value = "CardHitDto contaning card hit numbers", required = true) CardHitDto cardHitDto){
+
+        try {
+            return gameService.getWinningPin(cardHitDto);
+        } catch (GameServerException e) {
+            LOGGER.error("Error getting winning pin");
+            Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
+            throw new WebApplicationException(response);
+        }
+    }
 }

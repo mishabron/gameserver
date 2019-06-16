@@ -78,6 +78,19 @@ public class GameServiceImpl implements GameService {
         return cardDto;
     }
 
+    @Override
+    public String getWinningPin(CardHitDto cardHitDto) throws GameServerException {
+
+        Game game = gameRepository.findByName(cardHitDto.getGame());
+
+        Card card = cardRepository.findByCardNumberAndGameId(cardHitDto.getCardNumber(),game.getId());
+
+        //validate card
+        validatePlayedCard(card, cardHitDto.getDeviceId());
+
+        return card.getWinPin();
+    }
+
     private boolean canPlay(Card card) {
 
         boolean played = false;
@@ -159,6 +172,19 @@ public class GameServiceImpl implements GameService {
             throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
         }else if(card.isPlayed()){
             throw new GameServerException("Card is played already",500,ErrorCode.PLAYED);
+        }
+    }
+
+    private void validatePlayedCard(Card card, String deviceId) throws GameServerException{
+        //validate card
+        if(card  == null){
+            throw new GameServerException("Card# Is Invalid",500, ErrorCode.INVALID);
+        } else if(StringUtils.isNotEmpty(card.getDeviceId()) && !card.getDeviceId().equals(deviceId)){
+            throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
+        }else if(!card.isActive()){
+            throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
+        }else if(!card.isPlayed()){
+            throw new GameServerException("Card is not played yet",500,ErrorCode.PLAYED);
         }
     }
 }

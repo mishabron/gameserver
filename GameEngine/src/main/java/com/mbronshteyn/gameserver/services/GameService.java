@@ -10,4 +10,6 @@ public interface GameService {
     CardDto logingCard(AuthinticateDto authDto) throws GameServerException;;
 
     CardDto hitCard(CardHitDto cardHitDto) throws GameServerException;
+
+    String getWinningPin(CardHitDto cardHitDto) throws GameServerException;
 }
