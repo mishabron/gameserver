@@ -164,6 +164,7 @@ public class CardServiceTest {
         CardDto hitCard = gameServiceImpl.hitCard(cardHitDto);
 
         Assert.assertTrue(hitCard.getHits().get(0).getNumber_3().isGuessed());
+        Assert.assertFalse(hitCard.getHits().get(0).getNumber_4().isGuessed());
         Assert.assertEquals(hitCard.getHits().get(0).getSequence(),1);
 
     }
