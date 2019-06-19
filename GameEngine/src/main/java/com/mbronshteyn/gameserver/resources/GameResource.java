@@ -66,7 +66,7 @@ public class GameResource {
     }
 
     @POST
-    @Path("/hit")
+    @Path("/winningPin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Winning Pin", notes="Get Winning Pin")
