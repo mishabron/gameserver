@@ -184,7 +184,7 @@ public class GameServiceImpl implements GameService {
         }else if(!card.isActive()){
             throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
         }else if(!card.isPlayed()){
-            throw new GameServerException("Card is not played yet",500,ErrorCode.PLAYED);
+            throw new GameServerException("Card is not played yet",500,ErrorCode.NOTPLAYED);
         }
     }
 }
