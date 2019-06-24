@@ -152,8 +152,9 @@
 						</goals>
 						<configuration>
 							<image>mbronshteyn/gameserver</image>
-							<newName>mbronshteyn/gameserver:${project.version}</newName>
+							<newName>docker.io/mbronshteyn/gameserver:${project.version}</newName>
 							<serverId>docker-hub</serverId>
+							<registryUrl>https://registry-1.docker.io/v2/ </registryUrl>
 							<pushImage>true</pushImage>
 						</configuration>
 					</execution>
@@ -165,8 +166,9 @@
 						</goals>
 						<configuration>
 							<image>mbronshteyn/gameserver</image>
-							<newName>mbronshteyn/gameserver:latest</newName>
+							<newName>docker.io/mbronshteyn/gameserver:latest</newName>
 							<serverId>docker-hub</serverId>
+							<registryUrl>https://registry-1.docker.io/v2/</registryUrl>
 							<pushImage>true</pushImage>
 						</configuration>
 					</execution>

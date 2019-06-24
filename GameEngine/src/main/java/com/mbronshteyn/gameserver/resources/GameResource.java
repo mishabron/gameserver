@@ -65,13 +65,20 @@ public class GameResource {
         }
     }
 
-    @POST
-    @Path("/winningPin")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
+    @Path("/winningPin/{game}/{cardNo}/{deviceId}")
+    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Winning Pin", notes="Get Winning Pin")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Winning Pin is read", response = CardDto.class)})
-    public String getWinningPin(@ApiParam(name = "hitCard", value = "CardHitDto contaning card hit numbers", required = true) CardHitDto cardHitDto){
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Winning Pin is read", response = String.class)})
+    public String getWinningPin(@ApiParam(name = "game", value = "Game Name", required = true) @PathParam("game") String game,
+                                @ApiParam(name = "cardNo", value = "Card NUmber", required = true) @PathParam("cardNo") Long cardNo,
+                                @ApiParam(name = "deviceId", value = "Device ID", required = true) @PathParam("deviceNo") String deviceId){
+
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setGame(game);
+        cardHitDto.setCardNumber(cardNo);
+        cardHitDto.setDeviceId(deviceId);
 
         try {
             return gameService.getWinningPin(cardHitDto);
