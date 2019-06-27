@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class PinHelper {
@@ -95,4 +96,19 @@ public class PinHelper {
         return ThreadLocalRandom.current().ints(0, 9999).distinct().limit(numberOfPins).mapToObj(p -> String.format("%04d", p)).collect(Collectors.toList());
     }
 
+    public String generareUniquePin(Card card) {
+
+        List<String> bonusPins = card.getBatch().getBonusPins().stream().map(p -> p.getId().getPin()).collect(Collectors.toList());
+        List<String> boostePins = card.getBatch().getBoosterPins().stream().map(p -> p.getId().getPin()).collect(Collectors.toList());
+        List<String> superPins = card.getBatch().getSuperPins().stream().map(p -> p.getId().getPin()).collect(Collectors.toList());
+
+        List<String> pins = Stream.concat(superPins.stream(), Stream.concat(bonusPins.stream(), boostePins.stream())).collect(Collectors.toList());
+
+        String uniquePin = RandomStringUtils.randomNumeric(4);
+        while(pins.contains(uniquePin)){
+            uniquePin = RandomStringUtils.randomNumeric(4);
+        }
+
+        return uniquePin;
+    }
 }

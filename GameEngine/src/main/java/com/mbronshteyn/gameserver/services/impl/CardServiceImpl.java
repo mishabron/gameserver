@@ -102,7 +102,7 @@ public class CardServiceImpl implements CardService {
         }
 
         card.setActive(true);
-        card.setWinPin(RandomStringUtils.randomNumeric(4));
+        card.setWinPin(pinHelper.generareUniquePin(card));
         card.setActivateDate(new Date());
         card.setActivateBy(securityUser.getUser());
 
