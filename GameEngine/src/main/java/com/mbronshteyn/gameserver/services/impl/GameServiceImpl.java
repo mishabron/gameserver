@@ -9,6 +9,7 @@ import com.mbronshteyn.gameserver.dto.game.*;
 import com.mbronshteyn.gameserver.exception.ErrorCode;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.GameService;
+import com.mbronshteyn.gameserver.services.helper.PinHelper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class GameServiceImpl implements GameService {
 
     @Autowired
     GameRepository gameRepository;
+
+    @Autowired
+    PinHelper pinHelper;
 
     @Override
     @Transactional

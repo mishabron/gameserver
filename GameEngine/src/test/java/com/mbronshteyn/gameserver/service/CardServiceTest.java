@@ -1,8 +1,6 @@
 package com.mbronshteyn.gameserver.service;
 
-import com.mbronshteyn.data.cards.Card;
-import com.mbronshteyn.data.cards.CardBatch;
-import com.mbronshteyn.data.cards.Game;
+import com.mbronshteyn.data.cards.*;
 import com.mbronshteyn.data.cards.repository.CardBatchRepository;
 import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
@@ -121,6 +119,16 @@ public class CardServiceTest {
         String bardcode = card.getBarcode();
         Card activeCard = cardService.activateCard(bardcode);
         Assert.assertTrue(activeCard.isActive());
+
+        for(BonusPin  bonusPin: testBatch.getBonusPins()){
+            Assert.assertNotEquals(activeCard.getWinPin(),bonusPin.getId().getPin());
+        }
+        for(SuperPin superPin: testBatch.getSuperPins()){
+            Assert.assertNotEquals(activeCard.getWinPin(),superPin.getId().getPin());
+        }
+        for(BoosterPin boosterPin: testBatch.getBoosterPins()){
+            Assert.assertNotEquals(activeCard.getWinPin(),boosterPin.getId().getPin());
+        }
 
     }
 

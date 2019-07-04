@@ -73,7 +73,7 @@ public class GameResource {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Winning Pin is read", response = String.class)})
     public String getWinningPin(@ApiParam(name = "game", value = "Game Name", required = true) @PathParam("game") String game,
                                 @ApiParam(name = "cardNo", value = "Card NUmber", required = true) @PathParam("cardNo") Long cardNo,
-                                @ApiParam(name = "deviceId", value = "Device ID", required = true) @PathParam("deviceNo") String deviceId){
+                                @ApiParam(name = "deviceId", value = "Device ID", required = true) @PathParam("deviceId") String deviceId){
 
         CardHitDto cardHitDto = new CardHitDto();
         cardHitDto.setGame(game);

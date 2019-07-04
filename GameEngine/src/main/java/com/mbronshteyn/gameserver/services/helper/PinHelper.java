@@ -2,7 +2,10 @@ package com.mbronshteyn.gameserver.services.helper;
 
 import com.mbronshteyn.data.cards.*;
 import com.mbronshteyn.data.cards.keys.AuxiliaryPinId;
+import com.mbronshteyn.data.cards.repository.BoosterPinRepository;
+import com.mbronshteyn.data.cards.repository.SuperPinRepository;
 import org.apache.commons.lang.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -14,6 +17,13 @@ import java.util.stream.Stream;
 
 @Component
 public class PinHelper {
+
+    @Autowired
+    SuperPinRepository superPinRepository;
+    @Autowired
+    BoosterPinRepository soosterPinRepository;
+    @Autowired
+    BoosterPinRepository boosterPinRepository;
 
     public PinHelper() {
     }
@@ -98,14 +108,12 @@ public class PinHelper {
 
     public String generareUniquePin(Card card) {
 
-        List<String> bonusPins = card.getBatch().getBonusPins().stream().map(p -> p.getId().getPin()).collect(Collectors.toList());
-        List<String> boostePins = card.getBatch().getBoosterPins().stream().map(p -> p.getId().getPin()).collect(Collectors.toList());
-        List<String> superPins = card.getBatch().getSuperPins().stream().map(p -> p.getId().getPin()).collect(Collectors.toList());
-
-        List<String> pins = Stream.concat(superPins.stream(), Stream.concat(bonusPins.stream(), boostePins.stream())).collect(Collectors.toList());
-
+        CardBatch batch = card.getBatch();
+        
         String uniquePin = RandomStringUtils.randomNumeric(4);
-        while(pins.contains(uniquePin)){
+        while(superPinRepository.findOne(new AuxiliaryPinId(batch,uniquePin)) != null &&
+                soosterPinRepository.findOne(new AuxiliaryPinId(batch,uniquePin)) != null &&
+                boosterPinRepository.findOne(new AuxiliaryPinId(batch,uniquePin)) != null){
             uniquePin = RandomStringUtils.randomNumeric(4);
         }
 

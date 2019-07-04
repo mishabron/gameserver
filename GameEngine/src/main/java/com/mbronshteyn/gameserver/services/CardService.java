@@ -5,6 +5,8 @@ import com.mbronshteyn.data.cards.CardBatch;
 import com.mbronshteyn.gameserver.dto.card.BatchDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 
+import java.util.List;
+
 public interface CardService {
 
     CardBatch generateCardsForBatch(BatchDto batch) throws GameServerException;
