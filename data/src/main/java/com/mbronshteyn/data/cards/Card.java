@@ -7,10 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -72,9 +69,6 @@ public class Card implements Serializable {
 	@CreatedDate
 	private Date createTime;
 
-	@Column(name="WinPin")
-	private String winPin;
-
 	//bi-directional many-to-one association to CardBatch
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="Batch_id", referencedColumnName="id")
@@ -82,7 +76,8 @@ public class Card implements Serializable {
 
 	//bi-directional many-to-one association to Hit
 	@OneToMany(mappedBy="card",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
-	private Set<Hit> hits = new HashSet<>();
+	@OrderBy("UpdateTime DESC")
+	private List<Play> plays = new ArrayList<>();
 
 	@Column(name="ActivateBy", length=45)
 	private String activateBy;
@@ -96,6 +91,9 @@ public class Card implements Serializable {
 	}
 
 	public Card() {
+		Play play = new Play();
+		play.setCard(this);
+		plays.add(play);
 	}
 
 	public Date getActivateDate() {
@@ -179,11 +177,11 @@ public class Card implements Serializable {
 	}
 
 	public String getWinPin() {
-		return this.winPin;
+		return getPlays().get(0).getWinPin();
 	}
 
 	public void setWinPin(String winPin) {
-		this.winPin = winPin;
+		getPlays().get(0).setWinPin(winPin);
 	}
 
 	public CardBatch getBatch() {
@@ -195,11 +193,7 @@ public class Card implements Serializable {
 	}
 
 	public Set<Hit> getHits() {
-		return this.hits;
-	}
-
-	public void setHits(Set<Hit> hits) {
-		this.hits = hits;
+		return getPlays().get(0).getHits();
 	}
 
 	public boolean isActive() {
@@ -246,18 +240,19 @@ public class Card implements Serializable {
 		this.activateBy = activateBy;
 	}
 
-	public Hit addHit(Hit hit) {
-		numberOfHits = numberOfHits +1;
-		hit.setCard(this);
-		hit.setSequence(numberOfHits);
-		getHits().add(hit);
-		return hit;
+	public List<Play> getPlays() {
+		return plays;
 	}
 
-	public Hit removeHit(Hit hit) {
-		getHits().remove(hit);
-		hit.setCard(null);
-		numberOfHits = numberOfHits -1;
+	public void setPlays(List<Play> plays) {
+		this.plays = plays;
+	}
+
+	public Hit addHit(Hit hit) {
+		numberOfHits = numberOfHits +1;
+		hit.setPlay(plays.get(0));
+		hit.setSequence(numberOfHits);
+		getHits().add(hit);
 		return hit;
 	}
 
@@ -271,7 +266,6 @@ public class Card implements Serializable {
 				gameId == card.gameId &&
 				paid == card.paid &&
 				played == card.played &&
-				winPin == card.winPin &&
 				Objects.equals(activateDate, card.activateDate) &&
 				Objects.equals(barcode, card.barcode) &&
 				Objects.equals(cardNumber, card.cardNumber) &&
@@ -279,11 +273,11 @@ public class Card implements Serializable {
 				Objects.equals(createdBy, card.createdBy) &&
 				Objects.equals(createTime, card.createTime) &&
 				Objects.equals(batch, card.batch) &&
-				Objects.equals(hits, card.hits);
+				Objects.equals(plays, card.plays);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, activateDate, active, barcode, cardNumber, email, gameId, paid, played, createdBy, createTime, winPin);
+		return Objects.hash(id, activateDate, active, barcode, cardNumber, email, gameId, paid, played, createdBy, createTime);
 	}
 }

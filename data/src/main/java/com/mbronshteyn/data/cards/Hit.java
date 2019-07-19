@@ -27,11 +27,14 @@ public class Hit implements Serializable {
     @Column(name="Sequence", nullable=false)
     private int sequence;
 
-    //bi-directional many-to-one association to Card
-    @Id
-    @ManyToOne
-    @JoinColumn(name="Card_id", referencedColumnName="id", nullable=false, insertable = false, updatable = false)
-    private Card card;
+	//bi-directional many-to-one association to Play
+	@Id
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "Play_no", referencedColumnName = "Play_no", nullable = false, insertable = false, updatable = false),
+			@JoinColumn(name = "Card_id", referencedColumnName = "Card_id", nullable = false, insertable = false, updatable = false)
+	})
+	private Play play;
 
 	@Column(name="BonusHit")
 	private boolean bonusHit;
@@ -116,31 +119,31 @@ public class Hit implements Serializable {
         this.sequence = sequence;
     }
 
-    public Card getCard() {
-        return card;
-    }
+	public Play getPlay() {
+		return play;
+	}
 
-    public void setCard(Card card) {
-        this.card = card;
-    }
+	public void setPlay(Play play) {
+		this.play = play;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Hit hit = (Hit) o;
-        return bonusHit == hit.bonusHit &&
-                Objects.equals(sequence, hit.sequence) &&
-                Objects.equals(card.getBarcode(), hit.card.getBarcode()) &&
-                Objects.equals(hitTime, hit.hitTime) &&
-                Objects.equals(number_1, hit.number_1) &&
-                Objects.equals(number_2, hit.number_2) &&
-                Objects.equals(number_3, hit.number_3) &&
-                Objects.equals(number_4, hit.number_4);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Hit hit = (Hit) o;
+		return sequence == hit.sequence &&
+				bonusHit == hit.bonusHit &&
+				Objects.equals(play, hit.play) &&
+				Objects.equals(hitTime, hit.hitTime) &&
+				Objects.equals(number_1, hit.number_1) &&
+				Objects.equals(number_2, hit.number_2) &&
+				Objects.equals(number_3, hit.number_3) &&
+				Objects.equals(number_4, hit.number_4);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(sequence, card.getBarcode(), bonusHit, hitTime, number_1, number_2, number_3, number_4);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(sequence, bonusHit, hitTime, number_1, number_2, number_3, number_4);
+	}
 }

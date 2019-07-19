@@ -1,8 +1,8 @@
 package com.mbronshteyn.data.cards.keys;
 
-import com.mbronshteyn.data.cards.Card;
+import com.mbronshteyn.data.cards.Play;
 
-import javax.persistence.*;
+import javax.persistence.IdClass;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class HitId implements Serializable {
 
     private Integer sequence;
 
-    private Card card;
+    private Play play;
 
     public Integer getSequence() {
         return sequence;
@@ -24,12 +24,12 @@ public class HitId implements Serializable {
         this.sequence = sequence;
     }
 
-    public Card getCard() {
-        return card;
+    public Play getPlay() {
+        return play;
     }
 
-    public void setCard(Card card) {
-        this.card = card;
+    public void setPlay(Play play) {
+        this.play = play;
     }
 
     @Override
@@ -37,12 +37,12 @@ public class HitId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HitId hitId = (HitId) o;
-        return sequence == hitId.sequence &&
-                Objects.equals(card, hitId.card);
+        return Objects.equals(sequence, hitId.sequence) &&
+                Objects.equals(play, hitId.play);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sequence, card);
+        return Objects.hash(sequence, play);
     }
 }
