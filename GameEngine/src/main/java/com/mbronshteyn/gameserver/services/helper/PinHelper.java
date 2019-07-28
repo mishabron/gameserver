@@ -106,7 +106,7 @@ public class PinHelper {
         return ThreadLocalRandom.current().ints(0, 9999).distinct().limit(numberOfPins).mapToObj(p -> String.format("%04d", p)).collect(Collectors.toList());
     }
 
-    public String generareUniquePin(Card card) {
+    public String generateUniquePin(Card card) {
 
         CardBatch batch = card.getBatch();
         

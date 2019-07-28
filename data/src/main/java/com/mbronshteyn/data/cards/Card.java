@@ -74,9 +74,12 @@ public class Card implements Serializable {
 	@JoinColumn(name="Batch_id", referencedColumnName="id")
 	private CardBatch batch;
 
-	//bi-directional many-to-one association to Hit
-	@OneToMany(mappedBy="card",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
-	@OrderBy("UpdateTime DESC")
+	@Column(name="CurrentPlay")
+	private int currentPlay = 0;
+
+	//bi-directional many-to-one association to Play
+	@OneToMany(mappedBy="card",fetch=FetchType.EAGER,cascade=CascadeType.ALL)
+	@OrderBy("Play_no ASC")
 	private List<Play> plays = new ArrayList<>();
 
 	@Column(name="ActivateBy", length=45)
@@ -91,9 +94,6 @@ public class Card implements Serializable {
 	}
 
 	public Card() {
-		Play play = new Play();
-		play.setCard(this);
-		plays.add(play);
 	}
 
 	public Date getActivateDate() {
@@ -177,11 +177,11 @@ public class Card implements Serializable {
 	}
 
 	public String getWinPin() {
-		return getPlays().get(0).getWinPin();
+		return getLastPlay().getWinPin();
 	}
 
 	public void setWinPin(String winPin) {
-		getPlays().get(0).setWinPin(winPin);
+		getLastPlay().setWinPin(winPin);
 	}
 
 	public CardBatch getBatch() {
@@ -192,8 +192,8 @@ public class Card implements Serializable {
 		this.batch = batch;
 	}
 
-	public Set<Hit> getHits() {
-		return getPlays().get(0).getHits();
+	public List<Hit> getHits() {
+		return getLastPlay().getHits();
 	}
 
 	public boolean isActive() {
@@ -240,8 +240,20 @@ public class Card implements Serializable {
 		this.activateBy = activateBy;
 	}
 
+	public int getCurrentPlay() {
+		return currentPlay;
+	}
+
+	public void setCurrentPlay(int currentPlay) {
+		this.currentPlay = currentPlay;
+	}
+
 	public List<Play> getPlays() {
 		return plays;
+	}
+
+	public Play getLastPlay(){
+		return plays.get(currentPlay);
 	}
 
 	public void setPlays(List<Play> plays) {
@@ -250,9 +262,9 @@ public class Card implements Serializable {
 
 	public Hit addHit(Hit hit) {
 		numberOfHits = numberOfHits +1;
-		hit.setPlay(plays.get(0));
+		hit.setPlay(getLastPlay());
 		hit.setSequence(numberOfHits);
-		getHits().add(hit);
+		getLastPlay().getHits().add(hit);
 		return hit;
 	}
 

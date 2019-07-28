@@ -3,6 +3,7 @@ package com.mbronshteyn.gameserver.services.impl;
 import com.mbronshteyn.data.cards.Card;
 import com.mbronshteyn.data.cards.CardBatch;
 import com.mbronshteyn.data.cards.Game;
+import com.mbronshteyn.data.cards.Play;
 import com.mbronshteyn.data.cards.repository.CardBatchRepository;
 import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
@@ -21,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -104,7 +103,12 @@ public class CardServiceImpl implements CardService {
         }
 
         card.setActive(true);
-        card.setWinPin(pinHelper.generareUniquePin(card));
+
+        Play play = new Play();
+        play.setPlayNumber(0);
+        play.setCard(card);
+        card.getPlays().add(play);
+        card.setWinPin(pinHelper.generateUniquePin(card));
         card.setActivateDate(new Date());
         card.setActivateBy(securityUser.getUser());
 

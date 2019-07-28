@@ -12,6 +12,7 @@ public class CardDto {
     List<HitDto> hits;
     String game;
     double balance;
+    boolean freeGame;
 
     public Long getCardNumber() {
         return cardNumber;
@@ -75,5 +76,13 @@ public class CardDto {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public boolean isFreeGame() {
+        return freeGame;
+    }
+
+    public void setFreeGame(boolean freeGame) {
+        this.freeGame = freeGame;
     }
 }

@@ -1,10 +1,7 @@
 package com.mbronshteyn.gameserver.data;
 
 
-import com.mbronshteyn.data.cards.Card;
-import com.mbronshteyn.data.cards.CardBatch;
-import com.mbronshteyn.data.cards.Game;
-import com.mbronshteyn.data.cards.Hit;
+import com.mbronshteyn.data.cards.*;
 import com.mbronshteyn.data.cards.repository.CardBatchRepository;
 import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
@@ -109,6 +106,10 @@ public class CardsEntitiesTest {
 
         //setup card
         Card card = new Card();
+        Play play = new Play();
+        play.setPlayNumber(0);
+        play.setCard(card);
+        card.getPlays().add(play);
         card.setCardNumber(Long.parseLong(RandomStringUtils.randomNumeric(12)));
         card.setBarcode(RandomStringUtils.randomAlphanumeric(7));
         card.setGameId(storedGame.getId());
@@ -174,7 +175,7 @@ public class CardsEntitiesTest {
         cardRepository.saveAndFlush(card4);
 
         Card testCard = cardRepository.findByCardNumber(card.getCardNumber());
-        Set<Hit> hits = testCard.getHits();
+        List<Hit> hits = testCard.getLastPlay().getHits();
         assertTrue(hits.size() == 3);
 
     }

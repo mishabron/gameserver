@@ -3,6 +3,7 @@ package com.mbronshteyn.gameserver.services.impl;
 import com.mbronshteyn.data.cards.Card;
 import com.mbronshteyn.data.cards.Game;
 import com.mbronshteyn.data.cards.Hit;
+import com.mbronshteyn.data.cards.Play;
 import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.dto.game.*;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -75,11 +77,30 @@ public class GameServiceImpl implements GameService {
         card.addHit(hit);
         card.setPlayed(canPlay(card));
 
-        cardRepository.save(card);
-
         CardDto cardDto = mapToCardDto(card, game);
 
+        //check and create free game
+        if(isWinnig(card) && card.getLastPlay().getHits().size() ==4){
+            card = createFreeGame(card);
+        }
+
+        cardRepository.save(card);
+
         return cardDto;
+    }
+
+    public Card createFreeGame(Card card) {
+
+        Play play = new Play();
+        play.setPlayNumber(card.getCurrentPlay()+1);
+        play.setCard(card);
+        card.getPlays().add(play);
+        card.setCurrentPlay(card.getCurrentPlay()+1);
+        card.setPlayed(false);
+        card.setWinPin(pinHelper.generateUniquePin(card));
+        card.setNumberOfHits(0);
+
+        return card;
     }
 
     @Override
@@ -99,7 +120,7 @@ public class GameServiceImpl implements GameService {
 
         boolean played = false;
 
-        if(card.getHits().size() == 4){
+        if((card.getLastPlay().getHits().size() == 4 && card.getCurrentPlay() ==0)  || (card.getLastPlay().getHits().size() == 3 && card.getCurrentPlay() ==1) || isWinnig(card)){
             played = true;
         }
 
@@ -116,8 +137,13 @@ public class GameServiceImpl implements GameService {
         cardDto.setPaid(card.isPaid());
         cardDto.setNumberOfHits(card.getNumberOfHits());
         cardDto.setGame(game.getName());
+        cardDto.setFreeGame(card.getCurrentPlay()>0);
 
-        switch(card.getHits().size()){
+        int attempts = card.getLastPlay().getHits().size();
+        if(isWinnig(card)){
+            attempts--;
+        }
+        switch(attempts){
             case 0:
                 cardDto.setBalance(card.getBatch().getPayout1().doubleValue());
                 break;
@@ -129,12 +155,10 @@ public class GameServiceImpl implements GameService {
                 break;
         }
 
-        card.getBatch().getPayout1();
-
         List<HitDto> hits = new ArrayList();
         cardDto.setHits(hits);
 
-        for(Hit hit: card.getHits()){
+        for(Hit hit: card.getLastPlay().getHits()){
 
             HitDto hitDto = new HitDto();
             hitDto.setSequence(hit.getSequence());
@@ -174,9 +198,27 @@ public class GameServiceImpl implements GameService {
             throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
         }else if(!card.isActive()){
             throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
-        }else if(card.isPlayed()){
+        }else if(card.isPlayed() && !isWinnig(card)){
             throw new GameServerException("Card is played already",500,ErrorCode.PLAYED);
         }
+    }
+
+    public boolean isWinnig(Card card) {
+
+        boolean winning = false;
+
+        List<Hit> hits = card.getLastPlay().getHits();
+
+        List<Integer> win1 = hits.stream().map(h -> h.getNumber_1()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(0, 1))).collect(Collectors.toList());
+        List<Integer> win2 = hits.stream().map(h -> h.getNumber_2()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(1, 2))).collect(Collectors.toList());
+        List<Integer> win3 = hits.stream().map(h -> h.getNumber_3()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(2, 3))).collect(Collectors.toList());
+        List<Integer> win4 = hits.stream().map(h -> h.getNumber_4()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(3, 4))).collect(Collectors.toList());
+
+        if(!win1.isEmpty() && !win2.isEmpty() && !win3.isEmpty() && !win4.isEmpty()){
+            winning = true;
+        }
+
+        return winning;
     }
 
     private void validatePlayedCard(Card card, String deviceId) throws GameServerException{

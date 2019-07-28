@@ -7,10 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name="Play")
@@ -43,7 +40,8 @@ public class Play implements Serializable {
 
     //bi-directional many-to-one association to Hit
     @OneToMany(mappedBy="play",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
-    private Set<Hit> hits = new HashSet<>();
+    @OrderBy("Sequence ASC")
+    private List<Hit> hits = new ArrayList<>();
 
     public int getPlayNumber() {
         return playNumber;
@@ -85,11 +83,11 @@ public class Play implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public Set<Hit> getHits() {
+    public List<Hit> getHits() {
         return hits;
     }
 
-    public void setHits(Set<Hit> hits) {
+    public void setHits(List<Hit> hits) {
         this.hits = hits;
     }
 

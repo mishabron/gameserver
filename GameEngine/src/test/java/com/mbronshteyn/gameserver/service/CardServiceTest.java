@@ -168,7 +168,7 @@ public class CardServiceTest {
         cardHitDto.setHit1(null);
         cardHitDto.setHit2(1);
         cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
-        cardHitDto.setHit4(1);
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(3,4))+1);
         CardDto hitCard = gameServiceImpl.hitCard(cardHitDto);
 
         Assert.assertTrue(hitCard.getHits().get(0).getNumber_3().isGuessed());
@@ -243,6 +243,95 @@ public class CardServiceTest {
         String pin = gameServiceImpl.getWinningPin(cardHitDto);
 
         Assert.assertEquals(pin,winPin);
+    }
+
+    @Test
+    public void testFreeGame() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+
+        //hit card
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(null);
+        cardHitDto.setHit2(1);
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(1);
+        CardDto hitCard = gameServiceImpl.hitCard(cardHitDto);
+        hitCard = gameServiceImpl.hitCard(cardHitDto);
+        hitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        //hit last attempt with winning pin
+        cardHitDto.setHit1(Integer.parseInt(winPin.substring(0,1)));
+        cardHitDto.setHit2(Integer.parseInt(winPin.substring(1,2)));
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(3,4)));
+        CardDto lastHitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        Assert.assertTrue(lastHitCard.isPlayed());
+
+        CardDto freeGameCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertTrue(!freeGameCard.isPlayed());
+        Assert.assertEquals(freeGameCard.getNumberOfHits(),0);
+        Assert.assertEquals(freeGameCard.getHits().size(),0);
+
+        cardHitDto.setHit1(8);
+        cardHitDto.setHit2(1);
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(1);
+        hitCard = gameServiceImpl.hitCard(cardHitDto);
+        Assert.assertEquals(hitCard.getNumberOfHits(),1);
 
     }
+
+    @Test
+    public void testWinGame() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+
+        //hit card
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        //hit last attempt with winning pin
+        cardHitDto.setHit1(Integer.parseInt(winPin.substring(0,1)));
+        cardHitDto.setHit2(Integer.parseInt(winPin.substring(1,2)));
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(3,4)));
+        CardDto lastHitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        Assert.assertTrue(gameServiceImpl.isWinnig(activeCard));
+
+        authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+        Assert.assertTrue(authCard.isPlayed());
+    }
+
 }
