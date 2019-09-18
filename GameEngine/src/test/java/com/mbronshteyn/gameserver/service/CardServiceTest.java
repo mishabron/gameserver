@@ -10,6 +10,7 @@ import com.mbronshteyn.gameserver.dto.card.BatchDto;
 import com.mbronshteyn.gameserver.dto.game.AuthinticateDto;
 import com.mbronshteyn.gameserver.dto.game.CardDto;
 import com.mbronshteyn.gameserver.dto.game.CardHitDto;
+import com.mbronshteyn.gameserver.dto.game.WinnerEmailDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.impl.CardServiceImpl;
 import com.mbronshteyn.gameserver.services.impl.GameServiceImpl;
@@ -334,4 +335,77 @@ public class CardServiceTest {
         Assert.assertTrue(authCard.isPlayed());
     }
 
+    @Test
+    public void testWinnerEmail() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+
+        //hit card
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        //hit last attempt with winning pin
+        cardHitDto.setHit1(Integer.parseInt(winPin.substring(0,1)));
+        cardHitDto.setHit2(Integer.parseInt(winPin.substring(1,2)));
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(3,4)));
+        CardDto lastHitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        WinnerEmailDto dto = new WinnerEmailDto();
+        dto.setCardNumber(activeCard.getCardNumber());
+        dto.setDeviceId("123");
+        dto.setGame("Pingo");
+        dto.setEmail("test#test.com");
+        gameServiceImpl.saveEmail(dto);
+    }
+
+    @Test(expected = GameServerException.class)
+    public void testWinnerEmail_NotPlayed() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+
+        //hit card
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        //hit last attempt with winning pin
+        cardHitDto.setHit1(Integer.parseInt(winPin.substring(0,1)));
+        cardHitDto.setHit2(Integer.parseInt(winPin.substring(1,2)));
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(0,1)));
+        CardDto lastHitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        WinnerEmailDto dto = new WinnerEmailDto();
+        dto.setCardNumber(activeCard.getCardNumber());
+        dto.setDeviceId("123");
+        dto.setGame("Pingo");
+        dto.setEmail("test#test.com");
+        gameServiceImpl.saveEmail(dto);
+    }
 }

@@ -4,6 +4,7 @@ import com.mbronshteyn.data.vendor.Contact;
 import com.mbronshteyn.gameserver.dto.game.AuthinticateDto;
 import com.mbronshteyn.gameserver.dto.game.CardDto;
 import com.mbronshteyn.gameserver.dto.game.CardHitDto;
+import com.mbronshteyn.gameserver.dto.game.WinnerEmailDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.GameService;
 import io.swagger.annotations.*;
@@ -84,6 +85,21 @@ public class GameResource {
             return gameService.getWinningPin(cardHitDto);
         } catch (GameServerException e) {
             LOGGER.error("Error getting winning pin");
+            Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    @POST
+    @Path("/sendEmail")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Save Email", notes="Sends Player Email")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Email is saved successfully")})
+    public void sendEmail(@ApiParam(name = "winnerObect", value = "WinnerEmailDto contaning card and email info", required = true) WinnerEmailDto winnerEmailDto){
+        try {
+            gameService.saveEmail(winnerEmailDto);
+        } catch (GameServerException e) {
+            LOGGER.error("Email is not saved");
             Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
             throw new WebApplicationException(response);
         }

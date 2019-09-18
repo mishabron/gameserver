@@ -37,6 +37,7 @@ public class GameServiceImpl implements GameService {
     public CardDto logingCard(AuthinticateDto authDto) throws GameServerException {
 
         Game game = gameRepository.findByName(authDto.getGame());
+        validateGame(game);
 
         Card card = cardRepository.findByCardNumberAndGameId(authDto.getCardNumber(),game.getId());
 
@@ -59,6 +60,7 @@ public class GameServiceImpl implements GameService {
     public CardDto hitCard(CardHitDto cardHitDto) throws GameServerException {
 
         Game game = gameRepository.findByName(cardHitDto.getGame());
+        validateGame(game);
 
         Card card = cardRepository.findByCardNumberAndGameId(cardHitDto.getCardNumber(),game.getId());
 
@@ -107,6 +109,7 @@ public class GameServiceImpl implements GameService {
     public String getWinningPin(CardHitDto cardHitDto) throws GameServerException {
 
         Game game = gameRepository.findByName(cardHitDto.getGame());
+        validateGame(game);
 
         Card card = cardRepository.findByCardNumberAndGameId(cardHitDto.getCardNumber(),game.getId());
 
@@ -114,6 +117,28 @@ public class GameServiceImpl implements GameService {
         validatePlayedCard(card, cardHitDto.getDeviceId());
 
         return card.getWinPin();
+    }
+
+    @Override
+    @Transactional
+    public void saveEmail(WinnerEmailDto winnerEmailDto) throws GameServerException {
+
+        Game game = gameRepository.findByName(winnerEmailDto.getGame());
+        validateGame(game);
+
+        Card card = cardRepository.findByCardNumberAndGameId(winnerEmailDto.getCardNumber(),game.getId());
+
+        //validate card
+        validatePlayedCard(card, winnerEmailDto.getDeviceId());
+
+        card.setEmail(winnerEmailDto.getEmail());
+        cardRepository.save(card);
+
+        sendEmailToPlayer(isWinnig(card));
+    }
+
+    private void sendEmailToPlayer(boolean winnig) throws GameServerException {
+
     }
 
     private boolean canPlay(Card card) {
@@ -231,6 +256,14 @@ public class GameServiceImpl implements GameService {
             throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
         }else if(!card.isPlayed()){
             throw new GameServerException("Card is not played yet",500,ErrorCode.NOTPLAYED);
+        }else if(!isWinnig(card)){
+            throw new GameServerException("Is not winning cardr",500,ErrorCode.NOTWINNER);
+        }
+    }
+
+    private void validateGame(Game game) throws GameServerException{
+        if(game  == null){
+            throw new GameServerException("Game# Is Invalid",500, ErrorCode.INVALID);
         }
     }
 }

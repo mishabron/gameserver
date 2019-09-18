@@ -97,6 +97,8 @@ public class CardsEntitiesTest {
     @Test
     public void testCardBatchCRUD(){
 
+        String testEmail = "test@test.com";
+
         CardBatch batch = new CardBatch();
         Game storedGame = gameRepository.findByName(game.getName());
         batch.setGame_id(storedGame.getId());
@@ -154,6 +156,7 @@ public class CardsEntitiesTest {
         hit1.setNumber_3(5);
         hit1.setNumber_4(8);
         card1.addHit(hit1);
+        card1.setEmail(testEmail);
 
         Card card3 = cardRepository.saveAndFlush(card1);
 
@@ -177,6 +180,7 @@ public class CardsEntitiesTest {
         Card testCard = cardRepository.findByCardNumber(card.getCardNumber());
         List<Hit> hits = testCard.getLastPlay().getHits();
         assertTrue(hits.size() == 3);
+        assertEquals(testCard.getEmail(),testEmail);
 
     }
 
