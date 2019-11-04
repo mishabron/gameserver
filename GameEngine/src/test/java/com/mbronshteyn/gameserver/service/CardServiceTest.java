@@ -23,6 +23,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,8 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles("test")
 @DataJpaTest
 public class CardServiceTest {
 
@@ -406,6 +411,7 @@ public class CardServiceTest {
         dto.setDeviceId("123");
         dto.setGame("Pingo");
         dto.setEmail("test#test.com");
+        dto.setEmail("misha_bronshteyn@hotmail.com");
         gameServiceImpl.saveEmail(dto);
     }
 }

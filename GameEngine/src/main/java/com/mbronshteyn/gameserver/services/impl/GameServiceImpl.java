@@ -9,6 +9,8 @@ import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.dto.game.*;
 import com.mbronshteyn.gameserver.exception.ErrorCode;
 import com.mbronshteyn.gameserver.exception.GameServerException;
+import com.mbronshteyn.gameserver.mail.Mail;
+import com.mbronshteyn.gameserver.services.EmailService;
 import com.mbronshteyn.gameserver.services.GameService;
 import com.mbronshteyn.gameserver.services.helper.PinHelper;
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +33,9 @@ public class GameServiceImpl implements GameService {
 
     @Autowired
     PinHelper pinHelper;
+
+    @Autowired
+    private EmailServiceImpl emailService;
 
     @Override
     @Transactional
@@ -134,10 +139,21 @@ public class GameServiceImpl implements GameService {
         card.setEmail(winnerEmailDto.getEmail());
         cardRepository.save(card);
 
-        sendEmailToPlayer(isWinnig(card));
+        sendEmailToPlayer(card);
     }
 
-    private void sendEmailToPlayer(boolean winnig) throws GameServerException {
+    private void sendEmailToPlayer(Card card) throws GameServerException {
+
+        if(isWinnig(card)){
+
+            Mail mail = new Mail();
+            mail.setFrom("winner@pingo.win");
+            mail.setTo(card.getEmail());
+            mail.setSubject("Sending Simple Email with JavaMailSender Example");
+            mail.setContent("This tutorial demonstrates how to send a simple email winner");
+
+            emailService.sendEmail(mail);
+        }
 
     }
 
