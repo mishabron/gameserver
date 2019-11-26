@@ -111,6 +111,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    @Transactional
     public String getWinningPin(CardHitDto cardHitDto) throws GameServerException {
 
         Game game = gameRepository.findByName(cardHitDto.getGame());
@@ -134,7 +135,7 @@ public class GameServiceImpl implements GameService {
         Card card = cardRepository.findByCardNumberAndGameId(winnerEmailDto.getCardNumber(),game.getId());
 
         //validate card
-        validatePlayedCard(card, winnerEmailDto.getDeviceId());
+        validateWinningCard(card, winnerEmailDto.getDeviceId());
 
         card.setEmail(winnerEmailDto.getEmail());
         cardRepository.save(card);
@@ -230,20 +231,6 @@ public class GameServiceImpl implements GameService {
         return cardDto;
     }
 
-    private void validateCard(Card card, String deviceId) throws GameServerException {
-
-        //validate card
-        if(card  == null){
-            throw new GameServerException("Card# Is Invalid",500, ErrorCode.INVALID);
-        } else if(StringUtils.isNotEmpty(card.getDeviceId()) && !card.getDeviceId().equals(deviceId)){
-            throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
-        }else if(!card.isActive()){
-            throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
-        }else if(card.isPlayed() && !isWinnig(card)){
-            throw new GameServerException("Card is played already",500,ErrorCode.PLAYED);
-        }
-    }
-
     public boolean isWinnig(Card card) {
 
         boolean winning = false;
@@ -262,7 +249,34 @@ public class GameServiceImpl implements GameService {
         return winning;
     }
 
+    private void validateCard(Card card, String deviceId) throws GameServerException {
+
+        //validate card
+        if(card  == null){
+            throw new GameServerException("Card# Is Invalid",500, ErrorCode.INVALID);
+        } else if(StringUtils.isNotEmpty(card.getDeviceId()) && !card.getDeviceId().equals(deviceId)){
+            throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
+        }else if(!card.isActive()){
+            throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
+        }else if(card.isPlayed() && !isWinnig(card)){
+            throw new GameServerException("Card is played already",500,ErrorCode.PLAYED);
+        }
+    }
+
     private void validatePlayedCard(Card card, String deviceId) throws GameServerException{
+
+        if(card  == null){
+            throw new GameServerException("Card# Is Invalid",500, ErrorCode.INVALID);
+        } else if(StringUtils.isNotEmpty(card.getDeviceId()) && !card.getDeviceId().equals(deviceId)){
+            throw new GameServerException("Card is used by another device",500,ErrorCode.INUSE);
+        }else if(!card.isActive()){
+            throw new GameServerException("Card is not active",500,ErrorCode.NOTACTIVE);
+        }else if(!card.isPlayed()){
+            throw new GameServerException("Card is not played yet",500,ErrorCode.NOTPLAYED);
+        }
+    }
+
+    private void validateWinningCard(Card card, String deviceId) throws GameServerException{
         //validate card
         if(card  == null){
             throw new GameServerException("Card# Is Invalid",500, ErrorCode.INVALID);

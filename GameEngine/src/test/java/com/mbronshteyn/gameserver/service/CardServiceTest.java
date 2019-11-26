@@ -373,7 +373,7 @@ public class CardServiceTest {
         dto.setCardNumber(activeCard.getCardNumber());
         dto.setDeviceId("123");
         dto.setGame("Pingo");
-        dto.setEmail("test#test.com");
+        dto.setEmail("test@test.com");
         gameServiceImpl.saveEmail(dto);
     }
 

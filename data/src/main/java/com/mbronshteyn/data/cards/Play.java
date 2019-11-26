@@ -39,7 +39,7 @@ public class Play implements Serializable {
     private String createdBy;
 
     //bi-directional many-to-one association to Hit
-    @OneToMany(mappedBy="play",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
+    @OneToMany(mappedBy="play",fetch=FetchType.EAGER,cascade=CascadeType.ALL)
     @OrderBy("Sequence ASC")
     private List<Hit> hits = new ArrayList<>();
 

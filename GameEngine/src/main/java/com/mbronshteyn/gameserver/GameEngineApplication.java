@@ -1,6 +1,7 @@
 package com.mbronshteyn.gameserver;
 
 import com.mbronshteyn.authentication.security.binding.AuthinticationDynamicFeature;
+import com.mbronshteyn.gameserver.audit.GameAuditorConfig;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.resources.CardsResource;
 import com.mbronshteyn.gameserver.resources.DistributorResource;
@@ -20,7 +21,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Properties;
 
 @SpringBootApplication
 @EnableEncryptableProperties
@@ -36,7 +41,7 @@ public class GameEngineApplication extends ResourceConfig{
 		return new SecurityUser();
 	}
 
-	public GameEngineApplication() {		
+	public GameEngineApplication() {
 		
 		property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
 		
