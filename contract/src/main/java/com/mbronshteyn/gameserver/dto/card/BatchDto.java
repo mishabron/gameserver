@@ -12,7 +12,6 @@ public class BatchDto {
     private BigDecimal payout2;
     private BigDecimal payout3;
     private int numberOfBonusPins;
-    private int numberOfBooserPins;
     private int numberOfSuperPins;
 
     public String getGameName() {
@@ -77,14 +76,6 @@ public class BatchDto {
 
     public void setNumberOfBonusPins(int numberOfBonusPins) {
         this.numberOfBonusPins = numberOfBonusPins;
-    }
-
-    public int getNumberOfBooserPins() {
-        return numberOfBooserPins;
-    }
-
-    public void setNumberOfBooserPins(int numberOfBooserPins) {
-        this.numberOfBooserPins = numberOfBooserPins;
     }
 
     public int getNumberOfSuperPins() {

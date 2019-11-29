@@ -31,6 +31,17 @@ public abstract class AuxiliaryPin implements Serializable {
 	@Column(name="Used")
 	protected boolean used;
 
+	@Column(name="card_number", nullable=false, length=12)
+	private Long cardNumber;
+
+	public Long getCardNumber() {
+		return cardNumber;
+	}
+
+	public void setCardNumber(Long cardNumber) {
+		this.cardNumber = cardNumber;
+	}
+
 	public boolean getActive() {
 		return this.active;
 	}

@@ -17,15 +17,27 @@ public class AuxiliaryPinId implements Serializable {
     @JoinColumn(name="Batch_id", referencedColumnName="id", nullable=false, insertable = false, updatable = false)
     protected CardBatch batch;
 
-    @Column(name="Pin", nullable=false)
-    protected String pin;
+    @Column(name="Position", nullable=false)
+    protected int pin;
+
+    @Column(name="Sequence", nullable=false)
+    private int sequence;
 
     public AuxiliaryPinId() {
     }
 
-    public AuxiliaryPinId(CardBatch batch, String pin) {
+    public AuxiliaryPinId(CardBatch batch, int sequence, int pin) {
         this.batch = batch;
+        this.sequence = sequence;
         this.pin = pin;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 
     public CardBatch getBatch() {
@@ -36,11 +48,11 @@ public class AuxiliaryPinId implements Serializable {
         this.batch = batch;
     }
 
-    public String getPin() {
+    public int getPin() {
         return pin;
     }
 
-    public void setPin(String pin) {
+    public void setPin(int pin) {
         this.pin = pin;
     }
 
@@ -49,12 +61,13 @@ public class AuxiliaryPinId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AuxiliaryPinId that = (AuxiliaryPinId) o;
-        return pin == that.pin &&
-                Objects.equals(batch, that.batch);
+        return sequence == that.sequence &&
+                Objects.equals(batch, that.batch) &&
+                Objects.equals(pin, that.pin);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(batch, pin);
+        return Objects.hash(batch, pin, sequence);
     }
 }

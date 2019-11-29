@@ -5,6 +5,7 @@ import com.mbronshteyn.data.cards.*;
 import com.mbronshteyn.data.cards.repository.CardBatchRepository;
 import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
+import com.mbronshteyn.data.cards.repository.HitPinRepository;
 import com.mbronshteyn.gameserver.audit.GameAuditorConfig;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.services.helper.PinHelper;
@@ -18,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -32,6 +35,8 @@ import static org.junit.Assert.*;
 @DataJpaTest
 @ContextConfiguration()
 @WebAppConfiguration
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles("test")
 public class CardsEntitiesTest {
 
     @Autowired
@@ -45,6 +50,9 @@ public class CardsEntitiesTest {
 
     @Autowired
     CardBatchRepository cardBatchRepository;
+
+    @Autowired
+    HitPinRepository hitPinRepository;
 
     @Autowired
     PinHelper pinHelper;
@@ -125,11 +133,9 @@ public class CardsEntitiesTest {
         List<String> generatedPins = pinHelper.generateUniquePins(bonusPins + boosterPins + superPins);
 
         List<String> pinsBonus = generatedPins.subList(0, bonusPins);
-        List<String> pinsBooster = generatedPins.subList(bonusPins, bonusPins + boosterPins);
         List<String> pinsSuper = generatedPins.subList(bonusPins + boosterPins, generatedPins.size());
 
         batch.setBonusPins(pinHelper.generateBulkBonusPins(batch,pinsBonus));
-        batch.setBoosterPins(pinHelper.generateBulkBoosterPins(batch,pinsBooster ));
         batch.setSuperPins(pinHelper.generateBulkSuperPins(batch,pinsSuper));
 
         CardBatch storedBatch = cardBatchRepository.saveAndFlush(batch);
@@ -141,7 +147,6 @@ public class CardsEntitiesTest {
         assertNotNull(testBatch);
         assertEquals(testBatch,storedBatch);
         assertEquals(testBatch.getBonusPins().size(),10);
-        assertEquals(testBatch.getBoosterPins().size(),15);
         assertEquals(testBatch.getSuperPins().size(),5);
         assertEquals(testBatch.getUpdateBy(),"TestUser");
 
@@ -182,6 +187,89 @@ public class CardsEntitiesTest {
         assertTrue(hits.size() == 3);
         assertEquals(testCard.getEmail(),testEmail);
 
+    }
+
+    @Test
+    public void testHitsCount(){
+
+        //setu batch
+        CardBatch batch = new CardBatch();
+        Game storedGame = gameRepository.findByName(game.getName());
+        batch.setGame_id(storedGame.getId());
+        batch.setBatchdate(new Date());
+        batch.setBarcode(RandomStringUtils.randomAlphanumeric(7));
+        batch.setCardsInBatch(1);
+
+        //setup card1
+        Card card1 = new Card();
+        Play play1 = new Play();
+        play1.setPlayNumber(0);
+        play1.setCard(card1);
+        card1.getPlays().add(play1);
+        card1.setCardNumber(Long.parseLong(RandomStringUtils.randomNumeric(12)));
+        card1.setBarcode(RandomStringUtils.randomAlphanumeric(7));
+        card1.setGameId(storedGame.getId());
+        card1.setWinPin(RandomStringUtils.randomNumeric(4));
+        batch.addCard(card1);
+        CardBatch storedBatch = cardBatchRepository.saveAndFlush(batch);
+
+        assertNotNull(storedBatch);
+
+        //make a hit1
+        Hit hit1 = new Hit();
+        hit1.setBatch(storedBatch);
+        hit1.setNumber_1(3);
+        hit1.setNumber_2(0);
+        hit1.setNumber_3(5);
+        hit1.setNumber_4(8);
+        hit1.setFirstPlay(true);
+        card1.addHit(hit1);
+        cardRepository.saveAndFlush(card1);
+
+        //setup card2
+        Card card2 = new Card();
+        Play play2 = new Play();
+        play2.setPlayNumber(0);
+        play2.setCard(card2);
+        card2.getPlays().add(play2);
+        card2.setCardNumber(Long.parseLong(RandomStringUtils.randomNumeric(12)));
+        card2.setBarcode(RandomStringUtils.randomAlphanumeric(7));
+        card2.setGameId(storedGame.getId());
+        card2.setWinPin(RandomStringUtils.randomNumeric(4));
+        batch.addCard(card2);
+
+        //make a hit2
+        Hit hit2 = new Hit();
+        hit2.setBatch(storedBatch);
+        hit2.setNumber_1(3);
+        hit2.setNumber_2(0);
+        hit2.setNumber_3(5);
+        hit2.setNumber_4(8);
+        hit2.setFirstPlay(true);
+        card2.addHit(hit2);
+        cardRepository.saveAndFlush(card2);
+
+        int hits1 = hitPinRepository.countByFirstPlayAndSequenceAndBatch(true, 1, storedBatch);
+        assertEquals(2,hits1);
+
+        //make a hit3
+        Hit hit3 = new Hit();
+        hit3.setBatch(storedBatch);
+        hit3.setNumber_1(3);
+        hit3.setNumber_2(0);
+        hit3.setNumber_3(5);
+        hit3.setNumber_4(8);
+        hit3.setFirstPlay(true);
+        card2.addHit(hit3);
+        cardRepository.saveAndFlush(card2);
+
+        int hits2 = hitPinRepository.countByFirstPlayAndSequenceAndBatch(true, 2, storedBatch);
+        assertEquals(1,hits2);
+
+        int hits3 = hitPinRepository.countByFirstPlayAndSequenceAndBatch(true, 3, storedBatch);
+        assertEquals(0,hits3);
+
+        List<Hit> allhits = hitPinRepository.findAll();
     }
 
 }

@@ -2,7 +2,7 @@ package com.mbronshteyn.gameserver.services.helper;
 
 import com.mbronshteyn.data.cards.*;
 import com.mbronshteyn.data.cards.keys.AuxiliaryPinId;
-import com.mbronshteyn.data.cards.repository.BoosterPinRepository;
+import com.mbronshteyn.data.cards.repository.BonusPinRepository;
 import com.mbronshteyn.data.cards.repository.SuperPinRepository;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class PinHelper {
@@ -21,9 +20,7 @@ public class PinHelper {
     @Autowired
     SuperPinRepository superPinRepository;
     @Autowired
-    BoosterPinRepository soosterPinRepository;
-    @Autowired
-    BoosterPinRepository boosterPinRepository;
+    BonusPinRepository bonusPinRepository;
 
     public PinHelper() {
     }
@@ -34,7 +31,8 @@ public class PinHelper {
 
         for(String pin: pinsBonus){
             BonusPin bonusPin = new BonusPin();
-            AuxiliaryPinId id = new AuxiliaryPinId(batch,pin);
+            //TODO
+            AuxiliaryPinId id = new AuxiliaryPinId(batch,0,1);
             bonusPin.setId(id);
             bonusPin.setActive(true);
             bonusPin.setUsed(false);
@@ -44,29 +42,14 @@ public class PinHelper {
         return bonusPins;
     }
 
-    public Set<BoosterPin> generateBulkBoosterPins(CardBatch batch,List<String> pinsBooster ){
-
-        HashSet<BoosterPin> boosterPins = new HashSet<>();
-
-        for(String pin: pinsBooster){
-            BoosterPin boosterPin = new BoosterPin();
-            AuxiliaryPinId id = new AuxiliaryPinId(batch,pin);
-            boosterPin.setId(id);
-            boosterPin.setActive(true);
-            boosterPin.setUsed(false);
-            boosterPins.add(boosterPin);
-        }
-
-        return boosterPins;
-    }
-
     public Set<SuperPin> generateBulkSuperPins(CardBatch batch, List<String> pinsSuper ){
 
         HashSet<SuperPin> superPins = new HashSet<>();
 
         for(String pin: pinsSuper){
             SuperPin superPin = new SuperPin();
-            AuxiliaryPinId id = new AuxiliaryPinId(batch,pin);
+            //TODO
+            AuxiliaryPinId id = new AuxiliaryPinId(batch,0,1);
             superPin.setId(id);
             superPin.setActive(true);
             superPin.setUsed(false);
@@ -111,9 +94,9 @@ public class PinHelper {
         CardBatch batch = card.getBatch();
         
         String uniquePin = RandomStringUtils.randomNumeric(4);
-        while(superPinRepository.findOne(new AuxiliaryPinId(batch,uniquePin)) != null &&
-                soosterPinRepository.findOne(new AuxiliaryPinId(batch,uniquePin)) != null &&
-                boosterPinRepository.findOne(new AuxiliaryPinId(batch,uniquePin)) != null){
+        //TODO
+        while(superPinRepository.findOne(new AuxiliaryPinId(batch,0,1)) != null &&
+                bonusPinRepository.findOne(new AuxiliaryPinId(batch,0,1)) != null ){
             uniquePin = RandomStringUtils.randomNumeric(4);
         }
 

@@ -77,7 +77,6 @@ public class CardServiceTest {
         batchDto.setGameName("Pingo");
         batchDto.setNumberOfCards(10);
         batchDto.setNumberOfBonusPins(2);
-        batchDto.setNumberOfBooserPins(15);
         batchDto.setNumberOfSuperPins(7);
         batchDto.setPayout1(new BigDecimal(100.0));
         batchDto.setPayout2(new BigDecimal(50.0));
@@ -98,7 +97,6 @@ public class CardServiceTest {
         batchDto.setGameName("Pingo");
         batchDto.setNumberOfCards(1000);
         batchDto.setNumberOfBonusPins(500);
-        batchDto.setNumberOfBooserPins(150);
         batchDto.setNumberOfSuperPins(200);
 
         CardBatch batch = cardService.generateCardsForBatch(batchDto);
@@ -131,9 +129,6 @@ public class CardServiceTest {
         }
         for(SuperPin superPin: testBatch.getSuperPins()){
             Assert.assertNotEquals(activeCard.getWinPin(),superPin.getId().getPin());
-        }
-        for(BoosterPin boosterPin: testBatch.getBoosterPins()){
-            Assert.assertNotEquals(activeCard.getWinPin(),boosterPin.getId().getPin());
         }
 
     }

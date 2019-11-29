@@ -39,6 +39,9 @@ public class Hit implements Serializable {
 	@Column(name="BonusHit")
 	private boolean bonusHit;
 
+	@Column(name="FirstPlay")
+	private boolean firstPlay;
+
 	@Column(name="HtTime", nullable=false)
 	@Temporal(TemporalType.TIMESTAMP)
 	@LastModifiedDate
@@ -55,6 +58,10 @@ public class Hit implements Serializable {
 
 	@Column(name="Number_4")
 	private Integer number_4;
+
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="Batch_id", referencedColumnName="id", nullable=false)
+	private CardBatch batch;
 
 	public Hit() {
 	}
@@ -125,6 +132,22 @@ public class Hit implements Serializable {
 
 	public void setPlay(Play play) {
 		this.play = play;
+	}
+
+	public CardBatch getBatch() {
+		return batch;
+	}
+
+	public void setBatch(CardBatch batch) {
+		this.batch = batch;
+	}
+
+	public boolean isFirstPlay() {
+		return firstPlay;
+	}
+
+	public void setFirstPlay(boolean firstPlay) {
+		this.firstPlay = firstPlay;
 	}
 
 	@Override

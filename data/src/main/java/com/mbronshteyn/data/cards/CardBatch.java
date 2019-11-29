@@ -71,19 +71,20 @@ public class CardBatch implements Serializable {
 
 	//bi-directional many-to-one association to BonusPin
 	@OneToMany(mappedBy="id.batch",fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private Set<BonusPin> bonusPins = new HashSet<>();;
-
-	//bi-directional many-to-one association to BoosterPin
-	@OneToMany(mappedBy="id.batch",fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private Set<BoosterPin> boosterPins = new HashSet<>();;
+	private Set<BonusPin> bonusPins = new HashSet<>();
 
 	//bi-directional many-to-one association to Card
 	@OneToMany(mappedBy="batch", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private Set<Card> cards = new HashSet<>();;
+	private Set<Card> cards = new HashSet<>();
 
 	//bi-directional many-to-one association to SuperPin
 	@OneToMany(mappedBy="id.batch",fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private Set<SuperPin> superPins = new HashSet<>();;
+	private Set<SuperPin> superPins = new HashSet<>();
+
+	//bi-directional many-to-one association to Card
+	@OneToMany(mappedBy="batch", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private Set<Hit> hits = new HashSet<>();
+
 
 	public int getId() {
 		return id;
@@ -200,6 +201,14 @@ public class CardBatch implements Serializable {
 		this.bonusPins = bonusPins;
 	}
 
+	public Set<Hit> getHits() {
+		return hits;
+	}
+
+	public void setHits(Set<Hit> hits) {
+		this.hits = hits;
+	}
+
 	public BonusPin addBonusPin(BonusPin bonusPin) {
 		getBonusPins().add(bonusPin);
 		bonusPin.getId().setBatch(this);
@@ -212,28 +221,6 @@ public class CardBatch implements Serializable {
 		bonusPin.getId().setBatch(null);
 
 		return bonusPin;
-	}
-
-	public Set<BoosterPin> getBoosterPins() {
-		return this.boosterPins;
-	}
-
-	public void setBoosterPins(Set<BoosterPin> boosterPins) {
-		this.boosterPins = boosterPins;
-	}
-
-	public BoosterPin addBoosterPin(BoosterPin boosterPin) {
-		getBoosterPins().add(boosterPin);
-		boosterPin.getId().setBatch(this);
-
-		return boosterPin;
-	}
-
-	public BoosterPin removeBoosterPin(BoosterPin boosterPin) {
-		getBoosterPins().remove(boosterPin);
-		boosterPin.getId().setBatch(null);
-
-		return boosterPin;
 	}
 
 	public Set<Card> getCards() {

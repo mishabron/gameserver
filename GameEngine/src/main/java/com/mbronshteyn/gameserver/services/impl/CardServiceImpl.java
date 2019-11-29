@@ -62,17 +62,15 @@ public class CardServiceImpl implements CardService {
         batch.setPayout3(batchDto.getPayout3());
 
         //generate total number of unique pins
-        List<String> generatedPins = pinHelper.generateUniquePins(batchDto.getNumberOfBonusPins() + batchDto.getNumberOfBooserPins() + batchDto.getNumberOfSuperPins());
+        List<String> generatedPins = pinHelper.generateUniquePins(batchDto.getNumberOfBonusPins() + batchDto.getNumberOfSuperPins());
 
         //split generated pins into groups
         List<String> pinsBonus = generatedPins.subList(0, batchDto.getNumberOfBonusPins());
-        List<String> pinsBooster = generatedPins.subList(batchDto.getNumberOfBonusPins(), batchDto.getNumberOfBonusPins() + batchDto.getNumberOfBooserPins());
-        List<String> pinsSuper = generatedPins.subList(batchDto.getNumberOfBonusPins() + batchDto.getNumberOfBooserPins(), generatedPins.size());
+        List<String> pinsBooster = generatedPins.subList(batchDto.getNumberOfBonusPins(), batchDto.getNumberOfBonusPins() );
+        List<String> pinsSuper = generatedPins.subList(batchDto.getNumberOfBonusPins() , generatedPins.size());
 
         LOGGER.info("Genereating Bonus Pins");
         batch.setBonusPins(pinHelper.generateBulkBonusPins(batch,pinsBonus));
-        LOGGER.info("Genereating Booser Pins");
-        batch.setBoosterPins(pinHelper.generateBulkBoosterPins(batch,pinsBooster));
         LOGGER.info("Genereating Super Pins");
         batch.setSuperPins(pinHelper.generateBulkSuperPins(batch,pinsSuper));
 
