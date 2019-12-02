@@ -61,18 +61,50 @@ public class CardServiceImpl implements CardService {
         batch.setPayout2(batchDto.getPayout2());
         batch.setPayout3(batchDto.getPayout3());
 
-        //generate total number of unique pins
-        List<String> generatedPins = pinHelper.generateUniquePins(batchDto.getNumberOfBonusPins() + batchDto.getNumberOfSuperPins());
+        //generate total number of unique positions for request1
+        int request1BonusPins = batchDto.getNumberOfBonusPins1() * batchDto.getNumberOfCards() / 100;
+        int request1SuperPins = batchDto.getNumberOfSuperPins1() * batchDto.getNumberOfCards() / 100;
+        if((request1BonusPins != 0 || request1SuperPins !=0) && request1BonusPins <batchDto.getNumberOfCards() && request1SuperPins <batchDto.getNumberOfCards()){
+            List<Integer> bonusPositionsRequest1 = pinHelper.generateUniquePins(batchDto.getNumberOfCards(), request1BonusPins + request1SuperPins);
+            //split generated pins into groups
+            List<Integer> pinsBonus = bonusPositionsRequest1.subList(0, request1BonusPins);
+            List<Integer> pinsSuper = bonusPositionsRequest1.subList(request1BonusPins, bonusPositionsRequest1.size());
 
-        //split generated pins into groups
-        List<String> pinsBonus = generatedPins.subList(0, batchDto.getNumberOfBonusPins());
-        List<String> pinsBooster = generatedPins.subList(batchDto.getNumberOfBonusPins(), batchDto.getNumberOfBonusPins() );
-        List<String> pinsSuper = generatedPins.subList(batchDto.getNumberOfBonusPins() , generatedPins.size());
+            LOGGER.info("Genereating Bonus Pins 1");
+            batch.setBonusPins(pinHelper.generateBulkBonusPins(batch, pinsBonus, 1));
+            LOGGER.info("Genereating Super Pins 1");
+            batch.setSuperPins(pinHelper.generateBulkSuperPins(batch, pinsSuper, 1));
+        }
 
-        LOGGER.info("Genereating Bonus Pins");
-        batch.setBonusPins(pinHelper.generateBulkBonusPins(batch,pinsBonus));
-        LOGGER.info("Genereating Super Pins");
-        batch.setSuperPins(pinHelper.generateBulkSuperPins(batch,pinsSuper));
+        //generate total number of unique positions for request2
+        int request2BonusPins = batchDto.getNumberOfBonusPins2() * batchDto.getNumberOfCards() / 100;
+        int request2SuperPins = batchDto.getNumberOfSuperPins2() * batchDto.getNumberOfCards() / 100;
+        if((request2BonusPins != 0 || request2SuperPins !=0) && request2BonusPins <batchDto.getNumberOfCards() && request2SuperPins <batchDto.getNumberOfCards()){
+            List<Integer> bonusPositionsRequest2 = pinHelper.generateUniquePins(batchDto.getNumberOfCards(), request2BonusPins + request2SuperPins);
+            //split generated pins into groups
+            List<Integer>  pinsBonus = bonusPositionsRequest2.subList(0, request2BonusPins);
+            List<Integer>  pinsSuper = bonusPositionsRequest2.subList(request2BonusPins, bonusPositionsRequest2.size());
+
+            LOGGER.info("Genereating Bonus Pins 2");
+            batch.getBonusPins().addAll(pinHelper.generateBulkBonusPins(batch, pinsBonus, 2));
+            LOGGER.info("Genereating Super Pins 2");
+            batch.getSuperPins().addAll(pinHelper.generateBulkSuperPins(batch, pinsSuper, 2));
+        }
+
+        //generate total number of unique positions for request3
+        int request3BonusPins = batchDto.getNumberOfBonusPins3() * batchDto.getNumberOfCards() / 100;
+        int request3SuperPins = batchDto.getNumberOfSuperPins3() * batchDto.getNumberOfCards() / 100;
+        if((request3BonusPins != 0 || request3SuperPins !=0) && request3BonusPins <batchDto.getNumberOfCards() && request3SuperPins <batchDto.getNumberOfCards()){
+            List<Integer> bonusPositionsRequest3 = pinHelper.generateUniquePins(batchDto.getNumberOfCards(), request3BonusPins + request3SuperPins);
+            //split generated pins into groups
+            List<Integer> pinsBonus = bonusPositionsRequest3.subList(0, request3BonusPins);
+            List<Integer> pinsSuper = bonusPositionsRequest3.subList(request3BonusPins, bonusPositionsRequest3.size());
+
+            LOGGER.info("Genereating Bonus Pins 3");
+            batch.getBonusPins().addAll(pinHelper.generateBulkBonusPins(batch, pinsBonus, 3));
+            LOGGER.info("Genereating Super Pins 3");
+            batch.getSuperPins().addAll(pinHelper.generateBulkSuperPins(batch, pinsSuper, 3));
+        }
 
         LOGGER.info("Genereating Cards");
         batch.setCards(pinHelper.generateBulkCard(batch,batchDto.getNumberOfCards()));

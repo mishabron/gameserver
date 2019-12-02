@@ -87,18 +87,16 @@ public class CardsEntitiesTest {
     @Test
     public void testPinGenerator(){
 
+        int numberOfCards = 100;
         int bonusPins = 10;
-        int boosterPins = 15;
         int superPins = 5;
 
-        List<String> generatedPins = pinHelper.generateUniquePins(bonusPins + boosterPins + superPins);
+        List<Integer> generatedPins = pinHelper.generateUniquePins(numberOfCards,bonusPins + superPins);
 
-        List<String> pinsBonus = generatedPins.subList(0, bonusPins);
-        List<String> pinsBooster = generatedPins.subList(bonusPins, bonusPins + boosterPins);
-        List<String> pinsSuper = generatedPins.subList(bonusPins + boosterPins, generatedPins.size());
+        List<Integer> pinsBonus = generatedPins.subList(0, bonusPins);
+        List<Integer> pinsSuper = generatedPins.subList(bonusPins, generatedPins.size());
 
         assertEquals(pinsBonus.size(),bonusPins);
-        assertEquals(pinsBooster.size(),boosterPins);
         assertEquals(pinsSuper.size(),superPins);
     }
 
@@ -127,16 +125,15 @@ public class CardsEntitiesTest {
         batch.addCard(card);
 
         int bonusPins = 10;
-        int boosterPins = 15;
         int superPins = 5;
 
-        List<String> generatedPins = pinHelper.generateUniquePins(bonusPins + boosterPins + superPins);
+        List<Integer> generatedPins = pinHelper.generateUniquePins(100,bonusPins + superPins);
 
-        List<String> pinsBonus = generatedPins.subList(0, bonusPins);
-        List<String> pinsSuper = generatedPins.subList(bonusPins + boosterPins, generatedPins.size());
+        List<Integer> pinsBonus = generatedPins.subList(0, bonusPins);
+        List<Integer> pinsSuper = generatedPins.subList(bonusPins , generatedPins.size());
 
-        batch.setBonusPins(pinHelper.generateBulkBonusPins(batch,pinsBonus));
-        batch.setSuperPins(pinHelper.generateBulkSuperPins(batch,pinsSuper));
+        batch.setBonusPins(pinHelper.generateBulkBonusPins(batch,pinsBonus,1));
+        batch.setSuperPins(pinHelper.generateBulkSuperPins(batch,pinsSuper,1));
 
         CardBatch storedBatch = cardBatchRepository.saveAndFlush(batch);
 
@@ -160,6 +157,7 @@ public class CardsEntitiesTest {
         hit1.setNumber_2(0);
         hit1.setNumber_3(5);
         hit1.setNumber_4(8);
+        hit1.setBatch(storedBatch);
         card1.addHit(hit1);
         card1.setEmail(testEmail);
 
@@ -169,6 +167,7 @@ public class CardsEntitiesTest {
         hit2.setNumber_1(3);
         hit2.setNumber_2(0);
         hit2.setNumber_3(5);
+        hit2.setBatch(storedBatch);
         card3.addHit(hit2);
 
         Card card4 = cardRepository.saveAndFlush(card3);
@@ -178,6 +177,7 @@ public class CardsEntitiesTest {
         hit3.setNumber_2(0);
         hit3.setNumber_3(5);
         hit3.setNumber_4(7);
+        hit3.setBatch(storedBatch);
         card4.addHit(hit3);
 
         cardRepository.saveAndFlush(card4);

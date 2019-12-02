@@ -31,7 +31,7 @@ public abstract class AuxiliaryPin implements Serializable {
 	@Column(name="Used")
 	protected boolean used;
 
-	@Column(name="card_number", nullable=false, length=12)
+	@Column(name="card_number", length=12)
 	private Long cardNumber;
 
 	public Long getCardNumber() {

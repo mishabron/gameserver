@@ -23,7 +23,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -76,8 +75,8 @@ public class CardServiceTest {
         BatchDto batchDto = new BatchDto();
         batchDto.setGameName("Pingo");
         batchDto.setNumberOfCards(10);
-        batchDto.setNumberOfBonusPins(2);
-        batchDto.setNumberOfSuperPins(7);
+        batchDto.setNumberOfBonusPins1(2);
+        batchDto.setNumberOfSuperPins1(7);
         batchDto.setPayout1(new BigDecimal(100.0));
         batchDto.setPayout2(new BigDecimal(50.0));
         batchDto.setPayout3(new BigDecimal(30.0));
@@ -96,8 +95,8 @@ public class CardServiceTest {
         BatchDto batchDto = new BatchDto();
         batchDto.setGameName("Pingo");
         batchDto.setNumberOfCards(1000);
-        batchDto.setNumberOfBonusPins(500);
-        batchDto.setNumberOfSuperPins(200);
+        batchDto.setNumberOfBonusPins1(50);
+        batchDto.setNumberOfSuperPins1(20);
 
         CardBatch batch = cardService.generateCardsForBatch(batchDto);
         CardBatch testBatch = cardBatchRepository.findByBarcode(batch.getBarcode());

@@ -7,6 +7,7 @@ public class HitDto {
     PinNumber number_2;
     PinNumber number_3;
     PinNumber number_4;
+    boolean freeGame;
     boolean bonusHit;
 
     public int getSequence() {
@@ -55,5 +56,13 @@ public class HitDto {
 
     public void setNumber_4(PinNumber number_4) {
         this.number_4 = number_4;
+    }
+
+    public boolean isFreeGame() {
+        return freeGame;
+    }
+
+    public void setFreeGame(boolean freeGame) {
+        this.freeGame = freeGame;
     }
 }

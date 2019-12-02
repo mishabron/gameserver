@@ -25,14 +25,13 @@ public class PinHelper {
     public PinHelper() {
     }
 
-    public Set<BonusPin> generateBulkBonusPins(CardBatch batch, List<String> pinsBonus){
+    public Set<BonusPin> generateBulkBonusPins(CardBatch batch, List<Integer> pinsBonus,int requestNo){
 
         HashSet<BonusPin> bonusPins = new HashSet<>();
 
-        for(String pin: pinsBonus){
+        for(Integer pin: pinsBonus){
             BonusPin bonusPin = new BonusPin();
-            //TODO
-            AuxiliaryPinId id = new AuxiliaryPinId(batch,0,1);
+            AuxiliaryPinId id = new AuxiliaryPinId(batch,requestNo,pin);
             bonusPin.setId(id);
             bonusPin.setActive(true);
             bonusPin.setUsed(false);
@@ -42,14 +41,13 @@ public class PinHelper {
         return bonusPins;
     }
 
-    public Set<SuperPin> generateBulkSuperPins(CardBatch batch, List<String> pinsSuper ){
+    public Set<SuperPin> generateBulkSuperPins(CardBatch batch, List<Integer> pinsSuper ,int requestNo){
 
         HashSet<SuperPin> superPins = new HashSet<>();
 
-        for(String pin: pinsSuper){
+        for(Integer pin: pinsSuper){
             SuperPin superPin = new SuperPin();
-            //TODO
-            AuxiliaryPinId id = new AuxiliaryPinId(batch,0,1);
+            AuxiliaryPinId id = new AuxiliaryPinId(batch,requestNo,pin);
             superPin.setId(id);
             superPin.setActive(true);
             superPin.setUsed(false);
@@ -84,9 +82,9 @@ public class PinHelper {
         return cards;
     }
 
-    public List<String>  generateUniquePins(int numberOfPins){
+    public List<Integer>  generateUniquePins(int total, int numberOfPins){
 
-        return ThreadLocalRandom.current().ints(0, 9999).distinct().limit(numberOfPins).mapToObj(p -> String.format("%04d", p)).collect(Collectors.toList());
+        return ThreadLocalRandom.current().ints(0, total).distinct().limit(numberOfPins).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
     }
 
     public String generateUniquePin(Card card) {

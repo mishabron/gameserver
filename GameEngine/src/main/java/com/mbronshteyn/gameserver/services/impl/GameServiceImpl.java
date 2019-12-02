@@ -80,6 +80,7 @@ public class GameServiceImpl implements GameService {
         hit.setNumber_2(cardHitDto.getHit2());
         hit.setNumber_3(cardHitDto.getHit3());
         hit.setNumber_4(cardHitDto.getHit4());
+        hit.setBatch(card.getBatch());
 
         card.addHit(hit);
         card.setPlayed(canPlay(card));
