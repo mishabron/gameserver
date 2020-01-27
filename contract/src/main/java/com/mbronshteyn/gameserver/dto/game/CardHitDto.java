@@ -10,6 +10,7 @@ public class CardHitDto {
     Integer hit3;
     Integer hit4;
     boolean bonusHit;
+    Bonus bonus;
 
     public String getDeviceId() {
         return deviceId;
@@ -73,5 +74,13 @@ public class CardHitDto {
 
     public void setBonusHit(boolean bonusHit) {
         this.bonusHit = bonusHit;
+    }
+
+    public Bonus getBonus() {
+        return bonus;
+    }
+
+    public void setBonus(Bonus bonus) {
+        this.bonus = bonus;
     }
 }

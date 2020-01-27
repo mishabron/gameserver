@@ -84,19 +84,12 @@ public class PinHelper {
 
     public List<Integer>  generateUniquePins(int total, int numberOfPins){
 
-        return ThreadLocalRandom.current().ints(0, total).distinct().limit(numberOfPins).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
+        return ThreadLocalRandom.current().ints(1, total).distinct().limit(numberOfPins).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
     }
 
     public String generateUniquePin(Card card) {
 
-        CardBatch batch = card.getBatch();
-        
         String uniquePin = RandomStringUtils.randomNumeric(4);
-        //TODO
-        while(superPinRepository.findOne(new AuxiliaryPinId(batch,0,1)) != null &&
-                bonusPinRepository.findOne(new AuxiliaryPinId(batch,0,1)) != null ){
-            uniquePin = RandomStringUtils.randomNumeric(4);
-        }
 
         return uniquePin;
     }

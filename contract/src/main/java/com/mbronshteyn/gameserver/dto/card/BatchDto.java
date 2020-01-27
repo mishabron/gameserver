@@ -14,9 +14,11 @@ public class BatchDto {
     private int numberOfBonusPins1;
     private int numberOfBonusPins2;
     private int numberOfBonusPins3;
+    private int numberOfBonusPins4;
     private int numberOfSuperPins1;
     private int numberOfSuperPins2;
     private int numberOfSuperPins3;
+    private int numberOfSuperPins4;
 
     public String getGameName() {
         return gameName;
@@ -120,5 +122,21 @@ public class BatchDto {
 
     public void setNumberOfSuperPins3(int numberOfSuperPins3) {
         this.numberOfSuperPins3 = numberOfSuperPins3;
+    }
+
+    public int getNumberOfBonusPins4() {
+        return numberOfBonusPins4;
+    }
+
+    public void setNumberOfBonusPins4(int numberOfBonusPins4) {
+        this.numberOfBonusPins4 = numberOfBonusPins4;
+    }
+
+    public int getNumberOfSuperPins4() {
+        return numberOfSuperPins4;
+    }
+
+    public void setNumberOfSuperPins4(int numberOfSuperPins4) {
+        this.numberOfSuperPins4 = numberOfSuperPins4;
     }
 }

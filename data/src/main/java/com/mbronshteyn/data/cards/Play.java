@@ -1,6 +1,7 @@
 package com.mbronshteyn.data.cards;
 
 import com.mbronshteyn.data.cards.keys.PlayId;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name="Play")
@@ -81,6 +84,25 @@ public class Play implements Serializable {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public List<Hit> getNonBonusHits() {
+        return hits.stream().filter(h -> Objects.isNull(h.getBonusHit())).collect(Collectors.toList());
+    }
+
+    public int getLastNonBunusHitSequence(){
+        int seq = 0;
+
+        seq = (int) hits.stream().filter(h -> Objects.isNull(h.getBonusHit())).count();
+
+        return seq;
+    }
+
+    public Hit getLastNonBunusHit(){
+
+        Hit hit = hits.stream().filter(h -> Objects.isNull(h.getBonusHit())).reduce((first, second) -> second).orElse(null);
+
+        return hit;
     }
 
     public List<Hit> getHits() {

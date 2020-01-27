@@ -106,6 +106,21 @@ public class CardServiceImpl implements CardService {
             batch.getSuperPins().addAll(pinHelper.generateBulkSuperPins(batch, pinsSuper, 3));
         }
 
+        //generate total number of unique positions for request4
+        int request4BonusPins = batchDto.getNumberOfBonusPins4() * batchDto.getNumberOfCards() / 100;
+        int request4SuperPins = batchDto.getNumberOfSuperPins4() * batchDto.getNumberOfCards() / 100;
+        if((request4BonusPins != 0 || request4SuperPins !=0) && request4BonusPins <batchDto.getNumberOfCards() && request4SuperPins <batchDto.getNumberOfCards()){
+            List<Integer> bonusPositionsRequest4 = pinHelper.generateUniquePins(batchDto.getNumberOfCards(), request4BonusPins + request4SuperPins);
+            //split generated pins into groups
+            List<Integer> pinsBonus = bonusPositionsRequest4.subList(0, request4BonusPins);
+            List<Integer> pinsSuper = bonusPositionsRequest4.subList(request3BonusPins, bonusPositionsRequest4.size());
+
+            LOGGER.info("Genereating Bonus Pins 4");
+            batch.getBonusPins().addAll(pinHelper.generateBulkBonusPins(batch, pinsBonus, 4));
+            LOGGER.info("Genereating Super Pins 4");
+            batch.getSuperPins().addAll(pinHelper.generateBulkSuperPins(batch, pinsSuper, 4));
+        }
+
         LOGGER.info("Genereating Cards");
         batch.setCards(pinHelper.generateBulkCard(batch,batchDto.getNumberOfCards()));
 

@@ -1,6 +1,7 @@
 package com.mbronshteyn.data.cards;
 
 import com.mbronshteyn.data.cards.keys.HitId;
+import com.mbronshteyn.gameserver.dto.game.Bonus;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -36,8 +37,9 @@ public class Hit implements Serializable {
 	})
 	private Play play;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name="BonusHit")
-	private boolean bonusHit;
+	private Bonus bonusHit;
 
 	@Column(name="FirstPlay")
 	private boolean firstPlay;
@@ -63,14 +65,17 @@ public class Hit implements Serializable {
 	@JoinColumn(name="Batch_id", referencedColumnName="id", nullable=false)
 	private CardBatch batch;
 
+	@Column(name="Request_No")
+	private int requestNo;
+
 	public Hit() {
 	}
 
-	public boolean getBonusHit() {
+	public Bonus getBonusHit() {
 		return this.bonusHit;
 	}
 
-	public void setBonusHit(boolean bonusHit) {
+	public void setBonusHit(Bonus bonusHit) {
 		this.bonusHit = bonusHit;
 	}
 
@@ -114,10 +119,6 @@ public class Hit implements Serializable {
 		this.number_4 = number_4;
 	}
 
-	public boolean isBonusHit() {
-		return bonusHit;
-	}
-
     public int getSequence() {
         return sequence;
     }
@@ -148,6 +149,14 @@ public class Hit implements Serializable {
 
 	public void setFirstPlay(boolean firstPlay) {
 		this.firstPlay = firstPlay;
+	}
+
+	public void setRequestNo(int requestNo) {
+		this.requestNo = requestNo;
+	}
+
+	public int getRequestNo() {
+		return requestNo;
 	}
 
 	@Override

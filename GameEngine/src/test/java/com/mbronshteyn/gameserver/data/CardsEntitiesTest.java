@@ -8,6 +8,7 @@ import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.data.cards.repository.HitPinRepository;
 import com.mbronshteyn.gameserver.audit.GameAuditorConfig;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
+import com.mbronshteyn.gameserver.dto.game.Bonus;
 import com.mbronshteyn.gameserver.services.helper.PinHelper;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -27,7 +28,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -167,6 +167,7 @@ public class CardsEntitiesTest {
         hit2.setNumber_1(3);
         hit2.setNumber_2(0);
         hit2.setNumber_3(5);
+        hit2.setBonusHit(Bonus.BONUSPIN);
         hit2.setBatch(storedBatch);
         card3.addHit(hit2);
 
@@ -180,11 +181,25 @@ public class CardsEntitiesTest {
         hit3.setBatch(storedBatch);
         card4.addHit(hit3);
 
-        cardRepository.saveAndFlush(card4);
+        Card card5 = cardRepository.saveAndFlush(card4);
+
+        Hit hit4 = new Hit();
+        hit4.setNumber_1(3);
+        hit4.setNumber_2(0);
+        hit4.setNumber_3(5);
+        hit4.setNumber_4(7);
+        hit4.setBatch(storedBatch);
+        card5.addHit(hit4);
+
+        cardRepository.saveAndFlush(card5);
 
         Card testCard = cardRepository.findByCardNumber(card.getCardNumber());
-        List<Hit> hits = testCard.getLastPlay().getHits();
+        List<Hit> hits = testCard.getLastPlay().getNonBonusHits();
         assertTrue(hits.size() == 3);
+
+        int lastSeq = testCard.getLastPlay().getLastNonBunusHitSequence();
+        assertEquals(3,lastSeq);
+
         assertEquals(testCard.getEmail(),testEmail);
 
     }

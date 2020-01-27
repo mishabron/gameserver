@@ -1,16 +1,12 @@
 package com.mbronshteyn.gameserver.services.impl;
 
-import com.mbronshteyn.data.cards.Card;
-import com.mbronshteyn.data.cards.Game;
-import com.mbronshteyn.data.cards.Hit;
-import com.mbronshteyn.data.cards.Play;
-import com.mbronshteyn.data.cards.repository.CardRepository;
-import com.mbronshteyn.data.cards.repository.GameRepository;
+import com.mbronshteyn.data.cards.*;
+import com.mbronshteyn.data.cards.keys.AuxiliaryPinId;
+import com.mbronshteyn.data.cards.repository.*;
 import com.mbronshteyn.gameserver.dto.game.*;
 import com.mbronshteyn.gameserver.exception.ErrorCode;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.mail.Mail;
-import com.mbronshteyn.gameserver.services.EmailService;
 import com.mbronshteyn.gameserver.services.GameService;
 import com.mbronshteyn.gameserver.services.helper.PinHelper;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +33,15 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private EmailServiceImpl emailService;
 
+    @Autowired
+    HitPinRepository hitPinRepository;
+
+    @Autowired
+    BonusPinRepository bonusPinRepository;
+
+    @Autowired
+    SuperPinRepository superPinRepository;
+
     @Override
     @Transactional
     public CardDto logingCard(AuthinticateDto authDto) throws GameServerException {
@@ -57,6 +62,20 @@ public class GameServiceImpl implements GameService {
 
         CardDto cardDto = mapToCardDto(card, game);
 
+        //check for bonuses
+        if (card.getCurrentPlay()==0 && card.getNumberOfHits() > 0) {
+            int lastSeq = card.getLastPlay().getLastNonBunusHitSequence();
+            Hit hit = card.getLastPlay().getLastNonBunusHit();
+            BonusPin bonusPin = bonusPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
+            if(bonusPin != null && bonusPin.getCardNumber().equals(card.getCardNumber())) {
+                cardDto.setBonusPin(Bonus.BONUSPIN);
+            }
+            SuperPin superPin = superPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
+            if(superPin != null&& superPin.getCardNumber().equals(card.getCardNumber())) {
+                cardDto.setBonusPin(Bonus.SUPERPIN);
+            }
+        }
+
         return cardDto;
     }
 
@@ -75,20 +94,44 @@ public class GameServiceImpl implements GameService {
         //add new hit
 
         Hit hit = new Hit();
-        hit.setBonusHit(cardHitDto.isBonusHit());
+        hit.setBonusHit(cardHitDto.getBonus());
         hit.setNumber_1(cardHitDto.getHit1());
         hit.setNumber_2(cardHitDto.getHit2());
         hit.setNumber_3(cardHitDto.getHit3());
         hit.setNumber_4(cardHitDto.getHit4());
         hit.setBatch(card.getBatch());
+        hit.setFirstPlay(card.getCurrentPlay()==0);
 
         card.addHit(hit);
         card.setPlayed(canPlay(card));
 
         CardDto cardDto = mapToCardDto(card, game);
 
+        int lastSeq = card.getLastPlay().getLastNonBunusHitSequence();
+        int hitRequestNo = hitPinRepository.countByFirstPlayAndSequenceAndBatch(true, lastSeq, card.getBatch());
+        hit.setRequestNo(hitRequestNo);
+        //bonus hit only for first game
+        if (card.getCurrentPlay()==0) {
+            BonusPin bonusPin = bonusPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hitRequestNo));
+            if (bonusPin != null && bonusPin.isActive() && !bonusPin.isUsed()) {
+                cardDto.setBonusPin(Bonus.BONUSPIN);
+                bonusPin.setCardNumber(card.getCardNumber());
+                bonusPin.setActive(false);
+                bonusPin.setUsed(true);
+                bonusPinRepository.save(bonusPin);
+            }
+            SuperPin superPin = superPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hitRequestNo));
+            if (superPin != null && superPin.isActive() && !superPin.isUsed()) {
+                cardDto.setBonusPin(Bonus.SUPERPIN);
+                superPin.setCardNumber(card.getCardNumber());
+                superPin.setActive(false);
+                superPin.setUsed(true);
+                superPinRepository.save(superPin);
+            }
+        }
+
         //check and create free game
-        if(isWinnig(card) && card.getLastPlay().getHits().size() ==4){
+        if(isWinnig(card) && card.getCurrentPlay() == 0  && card.getLastPlay().getNonBonusHits().size() == 4){
             card = createFreeGame(card);
         }
 
@@ -163,7 +206,7 @@ public class GameServiceImpl implements GameService {
 
         boolean played = false;
 
-        if((card.getLastPlay().getHits().size() == 4 && card.getCurrentPlay() ==0)  || (card.getLastPlay().getHits().size() == 3 && card.getCurrentPlay() ==1) || isWinnig(card)){
+        if((card.getLastPlay().getNonBonusHits().size() == 4 && card.getCurrentPlay() ==0)  || (card.getLastPlay().getNonBonusHits().size() == 3 && card.getCurrentPlay() ==1) || isWinnig(card)){
             played = true;
         }
 
@@ -182,7 +225,7 @@ public class GameServiceImpl implements GameService {
         cardDto.setGame(game.getName());
         cardDto.setFreeGame(card.getCurrentPlay()>0);
 
-        int attempts = card.getLastPlay().getHits().size();
+        int attempts = card.getLastPlay().getNonBonusHits().size();
         if(isWinnig(card)){
             attempts--;
         }
@@ -201,11 +244,10 @@ public class GameServiceImpl implements GameService {
         List<HitDto> hits = new ArrayList();
         cardDto.setHits(hits);
 
-        for(Hit hit: card.getLastPlay().getHits()){
+        for(Hit hit: card.getLastPlay().getNonBonusHits()){
 
             HitDto hitDto = new HitDto();
             hitDto.setSequence(hit.getSequence());
-            hitDto.setBonusHit(hit.isBonusHit());
 
             PinNumber pinNumber1 = new PinNumber();
             pinNumber1.setNumber(hit.getNumber_1());
@@ -236,7 +278,7 @@ public class GameServiceImpl implements GameService {
 
         boolean winning = false;
 
-        List<Hit> hits = card.getLastPlay().getHits();
+        List<Hit> hits = card.getLastPlay().getNonBonusHits();
 
         List<Integer> win1 = hits.stream().map(h -> h.getNumber_1()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(0, 1))).collect(Collectors.toList());
         List<Integer> win2 = hits.stream().map(h -> h.getNumber_2()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(1, 2))).collect(Collectors.toList());

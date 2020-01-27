@@ -192,10 +192,6 @@ public class Card implements Serializable {
 		this.batch = batch;
 	}
 
-	public List<Hit> getHits() {
-		return getLastPlay().getHits();
-	}
-
 	public boolean isActive() {
 		return active;
 	}

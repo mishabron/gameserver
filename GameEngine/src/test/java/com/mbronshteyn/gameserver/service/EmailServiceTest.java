@@ -7,9 +7,12 @@ import com.mbronshteyn.gameserver.services.impl.GameServiceImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,7 +23,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @DataJpaTest
 public class EmailServiceTest {
 
+    @Mock
+    private JavaMailSender emailSender;
+
     @Autowired
+    @InjectMocks
     EmailServiceImpl emailService;
 
     @Test

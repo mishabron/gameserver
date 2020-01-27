@@ -1,34 +1,37 @@
 package com.mbronshteyn.gameserver.service;
 
 import com.mbronshteyn.data.cards.*;
+import com.mbronshteyn.data.cards.keys.AuxiliaryPinId;
+import com.mbronshteyn.data.cards.repository.BonusPinRepository;
 import com.mbronshteyn.data.cards.repository.CardBatchRepository;
 import com.mbronshteyn.data.cards.repository.CardRepository;
 import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.audit.GameAuditorConfig;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.dto.card.BatchDto;
-import com.mbronshteyn.gameserver.dto.game.AuthinticateDto;
-import com.mbronshteyn.gameserver.dto.game.CardDto;
-import com.mbronshteyn.gameserver.dto.game.CardHitDto;
-import com.mbronshteyn.gameserver.dto.game.WinnerEmailDto;
+import com.mbronshteyn.gameserver.dto.game.*;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.impl.CardServiceImpl;
+import com.mbronshteyn.gameserver.services.impl.EmailServiceImpl;
 import com.mbronshteyn.gameserver.services.impl.GameServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 
 @RunWith(SpringRunner.class)
@@ -37,6 +40,13 @@ import java.util.Set;
 @DataJpaTest
 public class CardServiceTest {
 
+    @Mock
+    private JavaMailSender emailSender;
+
+    @Autowired
+    @InjectMocks
+    EmailServiceImpl emailService;
+
     @Autowired
     GameRepository gameRepository;
 
@@ -44,10 +54,14 @@ public class CardServiceTest {
     CardServiceImpl cardService;
 
     @Autowired
+    @InjectMocks
     GameServiceImpl gameServiceImpl;
 
     @Autowired
     CardBatchRepository cardBatchRepository;
+
+    @Autowired
+    BonusPinRepository bonusPinRepository;
 
     @Autowired
     CardRepository cardRepository;
@@ -62,6 +76,7 @@ public class CardServiceTest {
     private String barcode;
     private String cardBarcode;
     private int cardId;
+    private CardBatch batch;
 
     @Before
     @Transactional
@@ -75,16 +90,22 @@ public class CardServiceTest {
         BatchDto batchDto = new BatchDto();
         batchDto.setGameName("Pingo");
         batchDto.setNumberOfCards(10);
-        batchDto.setNumberOfBonusPins1(2);
-        batchDto.setNumberOfSuperPins1(7);
         batchDto.setPayout1(new BigDecimal(100.0));
         batchDto.setPayout2(new BigDecimal(50.0));
         batchDto.setPayout3(new BigDecimal(30.0));
 
-        CardBatch batch = cardService.generateCardsForBatch(batchDto);
+        batch = cardService.generateCardsForBatch(batchDto);
         barcode = batch.getBarcode();
         cardBarcode = batch.getCards().stream().findFirst().get().getBarcode();
         cardId = batch.getCards().stream().findFirst().get().getId();
+
+        //setup bonus pins
+        BonusPin bonusPin = new BonusPin();
+        AuxiliaryPinId id = new AuxiliaryPinId(batch,2,1);
+        bonusPin.setId(id);
+        bonusPin.setActive(true);
+        bonusPin.setUsed(false);
+        bonusPinRepository.saveAndFlush(bonusPin);
 
         Mockito.when(securityUser.getUser()).thenReturn("TestUser");
     }
@@ -407,5 +428,76 @@ public class CardServiceTest {
         dto.setEmail("test#test.com");
         dto.setEmail("misha_bronshteyn@hotmail.com");
         gameServiceImpl.saveEmail(dto);
+    }
+
+    @Test
+    public void testBonusHitCard() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+        Assert.assertNull(authCard.getBonusPin());
+
+        //hit card 1
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(null);
+        cardHitDto.setHit2(1);
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2,3)));
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(3,4))+1);
+        CardDto hitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        Assert.assertNotNull(hitCard);
+        Assert.assertNull(hitCard.getBonusPin());
+
+        //hit card 2
+        cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(3);
+        cardHitDto.setHit2(4);
+        cardHitDto.setHit3(5);
+        cardHitDto.setHit4(6);
+        CardDto bonosHitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        Assert.assertNotNull(bonosHitCard);
+        Assert.assertEquals(Bonus.BONUSPIN,bonosHitCard.getBonusPin());
+
+        BonusPin bonus = bonusPinRepository.findOne(new AuxiliaryPinId(batch, 2, 1));
+        Assert.assertNotNull(bonus);
+        Assert.assertEquals(activeCard.getCardNumber(),bonus.getCardNumber());
+        Assert.assertTrue(bonus.isUsed());
+        Assert.assertTrue(!bonus.isActive());
+
+        //login card
+        CardDto loginCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertEquals(Bonus.BONUSPIN,loginCard.getBonusPin());
+
+        //hit card 3
+        cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(3);
+        cardHitDto.setHit2(4);
+        cardHitDto.setHit3(5);
+        cardHitDto.setHit4(6);
+        gameServiceImpl.hitCard(cardHitDto);
+
+        CardDto nonBonusCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNull(nonBonusCard.getBonusPin());
     }
 }

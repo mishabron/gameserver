@@ -13,6 +13,7 @@ public class CardDto {
     String game;
     double balance;
     boolean freeGame;
+    Bonus bonusPin;
 
     public Long getCardNumber() {
         return cardNumber;
@@ -84,5 +85,13 @@ public class CardDto {
 
     public void setFreeGame(boolean freeGame) {
         this.freeGame = freeGame;
+    }
+
+    public Bonus getBonusPin() {
+        return bonusPin;
+    }
+
+    public void setBonusPin(Bonus bonusPin) {
+        this.bonusPin = bonusPin;
     }
 }
