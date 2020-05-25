@@ -15,7 +15,7 @@ services:
             MYSQL_DATABASE: gameEngine
             MYSQL_ROOT_PASSWORD: mypassword
             MYSQL_USER: mishabron
-            MYSQL_PASSWORD: samolet07
+            MYSQL_PASSWORD:
     authentication:
         container_name: lotorola-authentication
         image: mbronshteyn/authentication:latest
