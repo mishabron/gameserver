@@ -67,11 +67,11 @@ public class GameServiceImpl implements GameService {
             int lastSeq = card.getLastPlay().getLastNonBunusHitSequence();
             Hit hit = card.getLastPlay().getLastNonBunusHit();
             BonusPin bonusPin = bonusPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
-            if(bonusPin != null && bonusPin.getCardNumber().equals(card.getCardNumber())) {
+            if(bonusPin != null && bonusPin.getCardNumber().equals(card.getCardNumber()) && !bonusPin.isUsed()) {
                 cardDto.setBonusPin(Bonus.BONUSPIN);
             }
             SuperPin superPin = superPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
-            if(superPin != null&& superPin.getCardNumber().equals(card.getCardNumber())) {
+            if(superPin != null&& superPin.getCardNumber().equals(card.getCardNumber()) && !superPin.isUsed()) {
                 cardDto.setBonusPin(Bonus.SUPERPIN);
             }
         }
@@ -244,10 +244,11 @@ public class GameServiceImpl implements GameService {
         List<HitDto> hits = new ArrayList();
         cardDto.setHits(hits);
 
-        for(Hit hit: card.getLastPlay().getNonBonusHits()){
+        for(Hit hit: card.getLastPlay().getHits()){
 
             HitDto hitDto = new HitDto();
             hitDto.setSequence(hit.getSequence());
+            hitDto.setBonusHit(hit.getBonusHit());
 
             PinNumber pinNumber1 = new PinNumber();
             pinNumber1.setNumber(hit.getNumber_1());

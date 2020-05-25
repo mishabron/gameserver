@@ -480,24 +480,30 @@ public class CardServiceTest {
         Assert.assertNotNull(bonus);
         Assert.assertEquals(activeCard.getCardNumber(),bonus.getCardNumber());
         Assert.assertTrue(bonus.isUsed());
-        Assert.assertTrue(!bonus.isActive());
+        Assert.assertFalse(bonus.isActive());
 
         //login card
         CardDto loginCard = gameServiceImpl.logingCard(authDto);
-        Assert.assertEquals(Bonus.BONUSPIN,loginCard.getBonusPin());
+        Assert.assertNull(loginCard.getBonusPin());
 
         //hit card 3
         cardHitDto = new CardHitDto();
         cardHitDto.setCardNumber(activeCard.getCardNumber());
         cardHitDto.setDeviceId("123");
         cardHitDto.setGame("Pingo");
+        cardHitDto.setBonus(bonosHitCard.getBonusPin());
+        cardHitDto.setBonusHit(true);
         cardHitDto.setHit1(3);
         cardHitDto.setHit2(4);
         cardHitDto.setHit3(5);
         cardHitDto.setHit4(6);
-        gameServiceImpl.hitCard(cardHitDto);
+        CardDto bonusCard = gameServiceImpl.hitCard(cardHitDto);
+        Assert.assertEquals(3,bonusCard.getHits().size());
+        Assert.assertEquals(Bonus.BONUSPIN,bonusCard.getHits().get(2).getBonusHit());
 
         CardDto nonBonusCard = gameServiceImpl.logingCard(authDto);
         Assert.assertNull(nonBonusCard.getBonusPin());
+        Assert.assertEquals(3,nonBonusCard.getHits().size());
+        Assert.assertEquals(Bonus.BONUSPIN,nonBonusCard.getHits().get(2).getBonusHit());
     }
 }
