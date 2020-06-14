@@ -66,13 +66,15 @@ public class GameServiceImpl implements GameService {
         if (card.getCurrentPlay()==0 && card.getNumberOfHits() > 0) {
             int lastSeq = card.getLastPlay().getLastNonBunusHitSequence();
             Hit hit = card.getLastPlay().getLastNonBunusHit();
-            BonusPin bonusPin = bonusPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
-            if(bonusPin != null && bonusPin.getCardNumber().equals(card.getCardNumber()) && !bonusPin.isUsed()) {
-                cardDto.setBonusPin(Bonus.BONUSPIN);
-            }
-            SuperPin superPin = superPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
-            if(superPin != null&& superPin.getCardNumber().equals(card.getCardNumber()) && !superPin.isUsed()) {
-                cardDto.setBonusPin(Bonus.SUPERPIN);
+            if (hit != null) {
+                BonusPin bonusPin = bonusPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
+                if (bonusPin != null && bonusPin.getCardNumber().equals(card.getCardNumber()) && !bonusPin.isUsed()) {
+                    cardDto.setBonusPin(Bonus.BONUSPIN);
+                }
+                SuperPin superPin = superPinRepository.findOne(new AuxiliaryPinId(card.getBatch(), lastSeq, hit.getRequestNo()));
+                if (superPin != null && superPin.getCardNumber().equals(card.getCardNumber()) && !superPin.isUsed()) {
+                    cardDto.setBonusPin(Bonus.SUPERPIN);
+                }
             }
         }
 

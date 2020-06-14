@@ -1,5 +1,6 @@
 package com.mbronshteyn.gameserver.dto.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CardDto {
@@ -65,6 +66,16 @@ public class CardDto {
 
     public List<HitDto> getHits() {
         return hits;
+    }
+
+    public List<HitDto> getNonBonusHits() {
+        List<HitDto> nonBonusHits = new ArrayList<HitDto>();
+        for(HitDto hit : hits){
+            if(hit.getBonusHit() == null){
+                nonBonusHits.add(hit);
+            }
+        }
+        return nonBonusHits;
     }
 
     public void setHits(List<HitDto> hits) {
