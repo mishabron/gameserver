@@ -9,7 +9,9 @@ import com.mbronshteyn.data.cards.repository.GameRepository;
 import com.mbronshteyn.gameserver.audit.GameAuditorConfig;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.dto.card.BatchDto;
+import com.mbronshteyn.gameserver.dto.card.BonusGenDto;
 import com.mbronshteyn.gameserver.dto.game.*;
+import com.mbronshteyn.gameserver.exception.ErrorCode;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.impl.CardServiceImpl;
 import com.mbronshteyn.gameserver.services.impl.EmailServiceImpl;
@@ -89,7 +91,7 @@ public class CardServiceTest {
 
         BatchDto batchDto = new BatchDto();
         batchDto.setGameName("Pingo");
-        batchDto.setNumberOfCards(10);
+        batchDto.setNumberOfCards(100);
         batchDto.setPayout1(new BigDecimal(100.0));
         batchDto.setPayout2(new BigDecimal(50.0));
         batchDto.setPayout3(new BigDecimal(30.0));
@@ -123,6 +125,39 @@ public class CardServiceTest {
         CardBatch testBatch = cardBatchRepository.findByBarcode(batch.getBarcode());
 
         Assert.assertEquals(batch,testBatch);
+    }
+
+    @Test
+    public void testBonusGeneration() throws GameServerException {
+
+        BonusGenDto bonusGenDto = new BonusGenDto();
+        bonusGenDto.setBatchId(batch.getId());
+        bonusGenDto.setNumberOfBonusPins1(100);
+        bonusGenDto.setNumberOfSuperPins1(0);
+        bonusGenDto.setNumberOfBonusPins2(0);
+        bonusGenDto.setNumberOfSuperPins2(100);
+        bonusGenDto.setNumberOfBonusPins3(60);
+        bonusGenDto.setNumberOfSuperPins3(40);
+        cardService.generateBonuses(bonusGenDto);
+
+        CardBatch testBatch = cardBatchRepository.findByBarcode(batch.getBarcode());
+
+        int bonus1 = Math.toIntExact(testBatch.getBonusPins().stream().filter(b -> b.getId().getSequence() == 1).count());
+        int bonus2 = Math.toIntExact(testBatch.getBonusPins().stream().filter(b -> b.getId().getSequence() == 2).count());
+        int bonus3 = Math.toIntExact(testBatch.getBonusPins().stream().filter(b -> b.getId().getSequence() == 3).count());
+
+        Assert.assertEquals(100,bonus1);
+        Assert.assertEquals(0,bonus2);
+        Assert.assertEquals(60,bonus3);
+
+        int super1 = Math.toIntExact(testBatch.getSuperPins().stream().filter(b -> b.getId().getSequence() == 1).count());
+        int super2 = Math.toIntExact(testBatch.getSuperPins().stream().filter(b -> b.getId().getSequence() == 2).count());
+        int super3 = Math.toIntExact(testBatch.getSuperPins().stream().filter(b -> b.getId().getSequence() == 3).count());
+
+        Assert.assertEquals(0,super1);
+        Assert.assertEquals(100,super2);
+        Assert.assertEquals(40,super3);
+
     }
 
     @Test
@@ -505,5 +540,25 @@ public class CardServiceTest {
         Assert.assertNull(nonBonusCard.getBonusPin());
         Assert.assertEquals(3,nonBonusCard.getHits().size());
         Assert.assertEquals(Bonus.BONUSPIN,nonBonusCard.getHits().get(2).getBonusHit());
+    }
+
+    @Test
+    public void testLogin() throws GameServerException {
+
+        ErrorCode errorCode  = null;
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(5555L);
+        try {
+            CardDto authCard = gameServiceImpl.logingCard(authDto);
+        } catch (GameServerException e) {
+            e.printStackTrace();
+            errorCode = e.getErrorCode();
+        }
+        Assert.assertNotNull(errorCode);
+        Assert.assertEquals(ErrorCode.INVALID,errorCode);
     }
 }

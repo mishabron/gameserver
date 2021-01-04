@@ -4,6 +4,7 @@ import com.mbronshteyn.authentication.security.binding.UserNameBinding;
 import com.mbronshteyn.data.cards.Card;
 import com.mbronshteyn.data.cards.CardBatch;
 import com.mbronshteyn.gameserver.dto.card.BatchDto;
+import com.mbronshteyn.gameserver.dto.card.BonusGenDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.CardService;
 import io.swagger.annotations.*;
@@ -97,5 +98,24 @@ public class CardsResource {
             Response response = Response.status(e.getErrorStatus()).build();
             throw new WebApplicationException(e.getMessage(),response);
         }
+    }
+
+    @POST
+    @Path("/generate/bonuses")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Genarate Bonuses", notes="Generate Bonuses for the CardBatch.")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful Card generation", response = String.class)})
+    @UserNameBinding
+    public Response generateBonuses(@ApiParam(name = "generateBonuses", value = "BonusGenDto contaning bonuses data", required = true) BonusGenDto bonusGenDto) {
+
+        try {
+            cardService.generateBonuses(bonusGenDto);
+            return Response.ok().build();
+        } catch (GameServerException e) {
+            LOGGER.error("Error creating Cards");
+            Response response = Response.status(e.getErrorStatus()).build();
+            throw new WebApplicationException(e.getMessage(),response);
+        }
+
     }
 }

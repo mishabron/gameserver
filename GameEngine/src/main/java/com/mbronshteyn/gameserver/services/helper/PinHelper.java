@@ -1,6 +1,9 @@
 package com.mbronshteyn.gameserver.services.helper;
 
-import com.mbronshteyn.data.cards.*;
+import com.mbronshteyn.data.cards.BonusPin;
+import com.mbronshteyn.data.cards.Card;
+import com.mbronshteyn.data.cards.CardBatch;
+import com.mbronshteyn.data.cards.SuperPin;
 import com.mbronshteyn.data.cards.keys.AuxiliaryPinId;
 import com.mbronshteyn.data.cards.repository.BonusPinRepository;
 import com.mbronshteyn.data.cards.repository.SuperPinRepository;
@@ -82,9 +85,9 @@ public class PinHelper {
         return cards;
     }
 
-    public List<Integer>  generateUniquePins(int total, int numberOfPins){
+    public List<Integer>  generateUniquePins(int total, int fromNumber, int numberOfPins){
 
-        return ThreadLocalRandom.current().ints(1, total).distinct().limit(numberOfPins).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
+        return ThreadLocalRandom.current().ints(1, total+1).distinct().limit(numberOfPins).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
     }
 
     public String generateUniquePin(Card card) {

@@ -27,9 +27,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -88,10 +91,12 @@ public class CardsEntitiesTest {
     public void testPinGenerator(){
 
         int numberOfCards = 100;
-        int bonusPins = 10;
-        int superPins = 5;
+        int bonusPins = 50;
+        int superPins = 50;
 
-        List<Integer> generatedPins = pinHelper.generateUniquePins(numberOfCards,bonusPins + superPins);
+        List<Integer> generatedPins = pinHelper.generateUniquePins(numberOfCards,1,bonusPins + superPins);
+        Set<Integer> uniquePins = new HashSet<Integer>(generatedPins);
+        assertEquals(generatedPins.size(),uniquePins.size());
 
         List<Integer> pinsBonus = generatedPins.subList(0, bonusPins);
         List<Integer> pinsSuper = generatedPins.subList(bonusPins, generatedPins.size());
@@ -127,7 +132,7 @@ public class CardsEntitiesTest {
         int bonusPins = 10;
         int superPins = 5;
 
-        List<Integer> generatedPins = pinHelper.generateUniquePins(100,bonusPins + superPins);
+        List<Integer> generatedPins = pinHelper.generateUniquePins(100,1,bonusPins + superPins);
 
         List<Integer> pinsBonus = generatedPins.subList(0, bonusPins);
         List<Integer> pinsSuper = generatedPins.subList(bonusPins , generatedPins.size());
