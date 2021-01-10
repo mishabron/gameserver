@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -561,4 +562,47 @@ public class CardServiceTest {
         Assert.assertNotNull(errorCode);
         Assert.assertEquals(ErrorCode.INVALID,errorCode);
     }
+
+    @Test
+    public void testHistory() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+
+        //hit card
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(5);
+        cardHitDto.setHit2(1);
+        cardHitDto.setHit3(8);
+        cardHitDto.setHit4(0);
+        gameServiceImpl.hitCard(cardHitDto);
+        cardHitDto.setHit1(3);
+        cardHitDto.setHit2(2);
+        cardHitDto.setHit2(6);
+        cardHitDto.setHit2(7);
+        gameServiceImpl.hitCard(cardHitDto);
+
+        HistoryDto history = gameServiceImpl.getHistory(authDto);
+
+        Assert.assertEquals(1,history.getPlays().size());
+
+        List<HitDto> hits = history.getPlays().get(0).getHits();
+
+        Assert.assertEquals(2,hits.size());
+    }
+
 }

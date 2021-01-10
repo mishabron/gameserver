@@ -1,5 +1,6 @@
 package com.mbronshteyn.gameserver.dto.game;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class CardDto {
     double balance;
     boolean freeGame;
     Bonus bonusPin;
+    private double payout1;
+    private double payout2;
+    private double payout3;
 
     public Long getCardNumber() {
         return cardNumber;
@@ -104,5 +108,29 @@ public class CardDto {
 
     public void setBonusPin(Bonus bonusPin) {
         this.bonusPin = bonusPin;
+    }
+
+    public double getPayout1() {
+        return payout1;
+    }
+
+    public void setPayout1(double payout1) {
+        this.payout1 = payout1;
+    }
+
+    public double getPayout2() {
+        return payout2;
+    }
+
+    public void setPayout2(double payout2) {
+        this.payout2 = payout2;
+    }
+
+    public double getPayout3() {
+        return payout3;
+    }
+
+    public void setPayout3(double payout3) {
+        this.payout3 = payout3;
     }
 }

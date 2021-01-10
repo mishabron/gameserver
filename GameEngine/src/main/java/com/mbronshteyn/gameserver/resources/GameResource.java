@@ -1,10 +1,7 @@
 package com.mbronshteyn.gameserver.resources;
 
 import com.mbronshteyn.data.vendor.Contact;
-import com.mbronshteyn.gameserver.dto.game.AuthinticateDto;
-import com.mbronshteyn.gameserver.dto.game.CardDto;
-import com.mbronshteyn.gameserver.dto.game.CardHitDto;
-import com.mbronshteyn.gameserver.dto.game.WinnerEmailDto;
+import com.mbronshteyn.gameserver.dto.game.*;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.GameService;
 import io.swagger.annotations.*;
@@ -36,7 +33,7 @@ public class GameResource {
     @Path("/authinticate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Authinticate Card", notes="uthinticates Card before game")
+    @ApiOperation(value = "Authinticate Card", notes="authinticates Card before game")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Card Successfully Authinticated", response = CardDto.class)})
     public CardDto logingCard(@ApiParam(name = "authCard", value = "AuthinticateDto contaning parameters to authinticate card", required = true) AuthinticateDto authDto){
 
@@ -100,6 +97,22 @@ public class GameResource {
             gameService.saveEmail(winnerEmailDto);
         } catch (GameServerException e) {
             LOGGER.error("Email is not saved");
+            Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    @POST
+    @Path("/history")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Card play history", notes="teturns play history of a card")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Card Successfully Retrieved", response = HistoryDto.class)})
+    public HistoryDto getHistory(@ApiParam(name = "authCard", value = "AuthinticateDto contaning parameters to authinticate card", required = true) AuthinticateDto authDto){
+        try {
+            return gameService.getHistory(authDto);
+        } catch (GameServerException e) {
+            LOGGER.error("Card is not authinticated");
             Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
             throw new WebApplicationException(response);
         }

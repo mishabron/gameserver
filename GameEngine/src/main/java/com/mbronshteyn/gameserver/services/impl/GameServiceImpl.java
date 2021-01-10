@@ -189,6 +189,29 @@ public class GameServiceImpl implements GameService {
         sendEmailToPlayer(card);
     }
 
+    @Override
+    public HistoryDto getHistory(AuthinticateDto authDto) throws GameServerException {
+
+        HistoryDto historyDto = new HistoryDto();
+
+        Game game = gameRepository.findByName(authDto.getGame());
+        validateGame(game);
+
+        Card card = cardRepository.findByCardNumberAndGameId(authDto.getCardNumber(),game.getId());
+        //validate card
+        validateCard(card, authDto.getDeviceId());
+
+        historyDto.setCardNumber(card.getCardNumber());
+
+        for(Play play : card.getPlays()){
+            PlayDto playDto = new PlayDto();
+            playDto.setHits(getHitsDto(play));
+            playDto.setPlayNumber(play.getPlayNumber());
+            historyDto.addPlay(playDto);
+        }
+        return historyDto;
+    }
+
     private void sendEmailToPlayer(Card card) throws GameServerException {
 
         if(isWinnig(card)){
@@ -243,8 +266,12 @@ public class GameServiceImpl implements GameService {
                 break;
         }
 
+        cardDto.setPayout1(card.getBatch().getPayout1().doubleValue());
+        cardDto.setPayout2(card.getBatch().getPayout2().doubleValue());
+        cardDto.setPayout3(card.getBatch().getPayout3().doubleValue());
+
         List<HitDto> hits = new ArrayList();
-        cardDto.setHits(hits);
+        cardDto.setHits(getHitsDto(card.getLastPlay()));
 
         for(Hit hit: card.getLastPlay().getHits()){
 
@@ -293,6 +320,42 @@ public class GameServiceImpl implements GameService {
         }
 
         return winning;
+    }
+
+    private List<HitDto> getHitsDto(Play card){
+
+        List<HitDto> hits = new ArrayList();
+
+        for(Hit hit: card.getHits()){
+
+            HitDto hitDto = new HitDto();
+            hitDto.setSequence(hit.getSequence());
+            hitDto.setBonusHit(hit.getBonusHit());
+
+            PinNumber pinNumber1 = new PinNumber();
+            pinNumber1.setNumber(hit.getNumber_1());
+            pinNumber1.setGuessed(Integer.valueOf(card.getWinPin().substring(0,1)).equals(hit.getNumber_1()));
+            hitDto.setNumber_1(pinNumber1);
+
+            PinNumber pinNumber2 = new PinNumber();
+            pinNumber2.setNumber(hit.getNumber_2());
+            pinNumber2.setGuessed(Integer.valueOf(card.getWinPin().substring(1,2)).equals(hit.getNumber_2()));
+            hitDto.setNumber_2(pinNumber2);
+
+            PinNumber pinNumber3 = new PinNumber();
+            pinNumber3.setNumber(hit.getNumber_3());
+            pinNumber3.setGuessed(Integer.valueOf(card.getWinPin().substring(2,3)).equals(hit.getNumber_3()));
+            hitDto.setNumber_3(pinNumber3);
+
+            PinNumber pinNumber4 = new PinNumber();
+            pinNumber4.setNumber(hit.getNumber_4());
+            pinNumber4.setGuessed(Integer.valueOf(card.getWinPin().substring(3,4)).equals(hit.getNumber_4()));
+            hitDto.setNumber_4(pinNumber4);
+
+            hits.add(hitDto);
+        }
+
+        return hits;
     }
 
     private void validateCard(Card card, String deviceId) throws GameServerException {
