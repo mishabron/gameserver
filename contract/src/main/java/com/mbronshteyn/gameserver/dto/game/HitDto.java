@@ -1,6 +1,8 @@
 package com.mbronshteyn.gameserver.dto.game;
 
-public class HitDto {
+import java.io.Serializable;
+
+public class HitDto implements Serializable {
 
     int sequence;
     PinNumber number_1;

@@ -1,9 +1,10 @@
 package com.mbronshteyn.gameserver.dto.game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayDto {
+public class PlayDto implements Serializable {
 
     private int playNumber;
     List<HitDto> hits = new ArrayList<>();

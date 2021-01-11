@@ -1,9 +1,10 @@
 package com.mbronshteyn.gameserver.dto.game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistoryDto {
+public class HistoryDto implements Serializable {
 
     Long cardNumber;
     private List<PlayDto> plays = new ArrayList<>();
