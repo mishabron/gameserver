@@ -249,6 +249,7 @@ public class GameServiceImpl implements GameService {
         cardDto.setNumberOfHits(card.getNumberOfHits());
         cardDto.setGame(game.getName());
         cardDto.setFreeGame(card.getCurrentPlay()>0);
+        cardDto.setEmail(card.getEmail());
 
         int attempts = card.getLastPlay().getNonBonusHits().size();
         if(isWinnig(card)){

@@ -19,6 +19,7 @@ public class CardDto {
     private double payout1;
     private double payout2;
     private double payout3;
+    private String email;
 
     public Long getCardNumber() {
         return cardNumber;
@@ -132,5 +133,13 @@ public class CardDto {
 
     public void setPayout3(double payout3) {
         this.payout3 = payout3;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }
