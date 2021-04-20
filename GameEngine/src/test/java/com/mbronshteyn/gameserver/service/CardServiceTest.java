@@ -107,10 +107,17 @@ public class CardServiceTest {
         AuxiliaryPinId id = new AuxiliaryPinId(batch,2,1);
         bonusPin.setId(id);
         bonusPin.setActive(true);
+        bonusPin.setCardNumber(Long.valueOf(cardId));
         bonusPin.setUsed(false);
         bonusPinRepository.saveAndFlush(bonusPin);
 
         Mockito.when(securityUser.getUser()).thenReturn("TestUser");
+    }
+
+    @Test
+    public void testBonusPinForCard(){
+        BonusPin bonus = bonusPinRepository.findByCardNumber(Long.valueOf(cardId));
+        Assert.assertNotNull(bonus);
     }
 
     @Test
@@ -498,6 +505,8 @@ public class CardServiceTest {
         Assert.assertNotNull(hitCard);
         Assert.assertNull(hitCard.getBonusPin());
 
+        Assert.assertEquals(batch.getPayout2(),new BigDecimal(hitCard.getBalance()));
+
         //hit card 2
         cardHitDto = new CardHitDto();
         cardHitDto.setCardNumber(activeCard.getCardNumber());
@@ -507,10 +516,12 @@ public class CardServiceTest {
         cardHitDto.setHit2(4);
         cardHitDto.setHit3(5);
         cardHitDto.setHit4(6);
-        CardDto bonosHitCard = gameServiceImpl.hitCard(cardHitDto);
+        CardDto bonusHitCard = gameServiceImpl.hitCard(cardHitDto);
 
-        Assert.assertNotNull(bonosHitCard);
-        Assert.assertEquals(Bonus.BONUSPIN,bonosHitCard.getBonusPin());
+        Assert.assertNotNull(bonusHitCard);
+        Assert.assertEquals(Bonus.BONUSPIN,bonusHitCard.getBonusPin());
+
+        Assert.assertEquals(batch.getPayout3(),new BigDecimal(bonusHitCard.getBalance()));
 
         BonusPin bonus = bonusPinRepository.findOne(new AuxiliaryPinId(batch, 2, 1));
         Assert.assertNotNull(bonus);
@@ -527,7 +538,7 @@ public class CardServiceTest {
         cardHitDto.setCardNumber(activeCard.getCardNumber());
         cardHitDto.setDeviceId("123");
         cardHitDto.setGame("Pingo");
-        cardHitDto.setBonus(bonosHitCard.getBonusPin());
+        cardHitDto.setBonus(bonusHitCard.getBonusPin());
         cardHitDto.setBonusHit(true);
         cardHitDto.setHit1(3);
         cardHitDto.setHit2(4);
@@ -536,6 +547,8 @@ public class CardServiceTest {
         CardDto bonusCard = gameServiceImpl.hitCard(cardHitDto);
         Assert.assertEquals(3,bonusCard.getHits().size());
         Assert.assertEquals(Bonus.BONUSPIN,bonusCard.getHits().get(2).getBonusHit());
+
+        Assert.assertEquals(batch.getPayout2(),new BigDecimal(bonusCard.getBalance()));
 
         CardDto nonBonusCard = gameServiceImpl.logingCard(authDto);
         Assert.assertNull(nonBonusCard.getBonusPin());

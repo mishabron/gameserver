@@ -253,7 +253,12 @@ public class GameServiceImpl implements GameService {
 
         int attempts = card.getLastPlay().getNonBonusHits().size();
         if(isWinnig(card)){
-            attempts--;
+            //attempts--;
+        }
+        else{
+            if(card.getLastPlay().getBonusHits().isPresent()){
+                attempts--;
+            }
         }
         switch(attempts){
             case 0:
@@ -309,7 +314,7 @@ public class GameServiceImpl implements GameService {
 
         boolean winning = false;
 
-        List<Hit> hits = card.getLastPlay().getNonBonusHits();
+        List<Hit> hits = card.getLastPlay().getHits();
 
         List<Integer> win1 = hits.stream().map(h -> h.getNumber_1()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(0, 1))).collect(Collectors.toList());
         List<Integer> win2 = hits.stream().map(h -> h.getNumber_2()).filter(n -> n == Integer.valueOf(card.getWinPin().substring(1, 2))).collect(Collectors.toList());

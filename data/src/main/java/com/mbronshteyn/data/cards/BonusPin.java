@@ -14,6 +14,17 @@ public class BonusPin extends AuxiliaryPin {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name="FreeAttempt")
+	protected boolean freeAttempt;
+
 	public BonusPin() {
+	}
+
+	public boolean isFreeAttempt() {
+		return freeAttempt;
+	}
+
+	public void setFreeAttempt(boolean freeAttempt) {
+		this.freeAttempt = freeAttempt;
 	}
 }

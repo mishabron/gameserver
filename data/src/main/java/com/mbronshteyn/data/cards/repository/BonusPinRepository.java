@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BonusPinRepository extends JpaRepository<BonusPin, AuxiliaryPinId> {
 
+    public BonusPin findByCardNumber(Long cardNumber);
+
 }

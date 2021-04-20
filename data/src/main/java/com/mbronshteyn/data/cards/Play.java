@@ -1,6 +1,7 @@
 package com.mbronshteyn.data.cards;
 
 import com.mbronshteyn.data.cards.keys.PlayId;
+import com.mbronshteyn.gameserver.dto.game.Bonus;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -88,6 +89,10 @@ public class Play implements Serializable {
 
     public List<Hit> getNonBonusHits() {
         return hits.stream().filter(h -> Objects.isNull(h.getBonusHit())).collect(Collectors.toList());
+    }
+
+    public Optional<Hit> getBonusHits(){
+       return hits.stream().filter(h -> !Objects.isNull(h.getBonusHit()) && h.getBonusHit().equals(Bonus.BONUSPIN)).findFirst();
     }
 
     public int getLastNonBunusHitSequence(){
