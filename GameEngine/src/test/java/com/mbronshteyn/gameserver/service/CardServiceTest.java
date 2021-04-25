@@ -352,6 +352,8 @@ public class CardServiceTest {
         Assert.assertTrue(!freeGameCard.isPlayed());
         Assert.assertEquals(freeGameCard.getNumberOfHits(),0);
         Assert.assertEquals(freeGameCard.getHits().size(),0);
+        Assert.assertTrue(freeGameCard.isFreeGame());
+        Assert.assertEquals(batch.getPayout1(),new BigDecimal(freeGameCard.getBalance()));
 
         cardHitDto.setHit1(8);
         cardHitDto.setHit2(1);
@@ -504,6 +506,7 @@ public class CardServiceTest {
 
         Assert.assertNotNull(hitCard);
         Assert.assertNull(hitCard.getBonusPin());
+        Assert.assertFalse(hitCard.isFreeAttempt());
 
         Assert.assertEquals(batch.getPayout2(),new BigDecimal(hitCard.getBalance()));
 
@@ -521,7 +524,9 @@ public class CardServiceTest {
         Assert.assertNotNull(bonusHitCard);
         Assert.assertEquals(Bonus.BONUSPIN,bonusHitCard.getBonusPin());
 
-        Assert.assertEquals(batch.getPayout3(),new BigDecimal(bonusHitCard.getBalance()));
+        CardDto cardWithFreeAttempt = gameServiceImpl.saveFreeAttempt(authDto);
+
+        Assert.assertEquals(batch.getPayout2(),new BigDecimal(cardWithFreeAttempt.getBalance()));
 
         BonusPin bonus = bonusPinRepository.findOne(new AuxiliaryPinId(batch, 2, 1));
         Assert.assertNotNull(bonus);
@@ -547,8 +552,8 @@ public class CardServiceTest {
         CardDto bonusCard = gameServiceImpl.hitCard(cardHitDto);
         Assert.assertEquals(3,bonusCard.getHits().size());
         Assert.assertEquals(Bonus.BONUSPIN,bonusCard.getHits().get(2).getBonusHit());
-
         Assert.assertEquals(batch.getPayout2(),new BigDecimal(bonusCard.getBalance()));
+        Assert.assertTrue(bonusCard.isFreeAttempt());
 
         CardDto nonBonusCard = gameServiceImpl.logingCard(authDto);
         Assert.assertNull(nonBonusCard.getBonusPin());
@@ -616,6 +621,63 @@ public class CardServiceTest {
         List<HitDto> hits = history.getPlays().get(0).getHits();
 
         Assert.assertEquals(2,hits.size());
+    }
+
+
+    @Test
+    public void testFreeAttempt() throws GameServerException {
+
+        //activate card
+        Card activeCard = cardService.activateCard(cardBarcode);
+        Assert.assertNotNull(activeCard);
+        Assert.assertTrue(activeCard.isActive());
+        String winPin = activeCard.getWinPin();
+
+        //login card
+        AuthinticateDto authDto = new AuthinticateDto();
+        authDto.setDeviceId("123");
+        authDto.setGame("Pingo");
+        authDto.setCardNumber(activeCard.getCardNumber());
+        CardDto authCard = gameServiceImpl.logingCard(authDto);
+        Assert.assertNotNull(authCard);
+        Assert.assertNull(authCard.getBonusPin());
+
+        //hit card 1
+        CardHitDto cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(null);
+        cardHitDto.setHit2(1);
+        cardHitDto.setHit3(Integer.parseInt(winPin.substring(2, 3)));
+        cardHitDto.setHit4(Integer.parseInt(winPin.substring(3, 4)) + 1);
+        CardDto hitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        Assert.assertNotNull(hitCard);
+        Assert.assertNull(hitCard.getBonusPin());
+
+        Assert.assertEquals(batch.getPayout2(), new BigDecimal(hitCard.getBalance()));
+
+        //hit card 2
+        cardHitDto = new CardHitDto();
+        cardHitDto.setCardNumber(activeCard.getCardNumber());
+        cardHitDto.setDeviceId("123");
+        cardHitDto.setGame("Pingo");
+        cardHitDto.setHit1(3);
+        cardHitDto.setHit2(4);
+        cardHitDto.setHit3(5);
+        cardHitDto.setHit4(6);
+        CardDto bonusHitCard = gameServiceImpl.hitCard(cardHitDto);
+
+        Assert.assertNotNull(bonusHitCard);
+        Assert.assertEquals(Bonus.BONUSPIN, bonusHitCard.getBonusPin());
+
+        gameServiceImpl.saveFreeAttempt(authDto);
+
+        BonusPin bonisPing = bonusPinRepository.findByCardNumber(activeCard.getCardNumber());
+
+        Assert.assertNotNull(bonisPing);
+        Assert.assertTrue(bonisPing.isFreeAttempt());
     }
 
 }

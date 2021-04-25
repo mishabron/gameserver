@@ -133,13 +133,24 @@ public class GameServiceImpl implements GameService {
         }
 
         //check and create free game
-        if(isWinnig(card) && card.getCurrentPlay() == 0  && card.getLastPlay().getNonBonusHits().size() == 4){
+        if(isWinnig(card) && card.getCurrentPlay() == 0  && card.getLastPlay().getNonBonusHits().size() == maxAttempts(card.getCardNumber())){
             card = createFreeGame(card);
         }
 
         cardRepository.save(card);
 
         return cardDto;
+    }
+
+    private int maxAttempts(Long cardNumber) {
+
+        int maxAttempts = 4;
+        BonusPin bonusPin = bonusPinRepository.findByCardNumber(cardNumber);
+        if(bonusPin != null && bonusPin.isFreeAttempt()){
+            maxAttempts ++;
+        }
+
+        return maxAttempts;
     }
 
     public Card createFreeGame(Card card) {
@@ -190,6 +201,32 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    @Transactional
+    public CardDto saveFreeAttempt(AuthinticateDto authDto) throws GameServerException {
+
+        Game game = gameRepository.findByName(authDto.getGame());
+        validateGame(game);
+
+        Card card = cardRepository.findByCardNumberAndGameId(authDto.getCardNumber(),game.getId());
+
+        //validate card
+        validateCard(card, authDto.getDeviceId());
+
+        BonusPin bonusPin = bonusPinRepository.findByCardNumber(card.getCardNumber());
+        if(bonusPin == null){
+            throw new GameServerException("Card# Is Invalid for Bonus Pin",500, ErrorCode.INVALID);
+        }
+
+        bonusPin.setFreeAttempt(true);
+
+        bonusPinRepository.save(bonusPin);
+
+        CardDto cardDto = mapToCardDto(card, game);
+
+        return cardDto;
+    }
+
+    @Override
     public HistoryDto getHistory(AuthinticateDto authDto) throws GameServerException {
 
         HistoryDto historyDto = new HistoryDto();
@@ -231,7 +268,7 @@ public class GameServiceImpl implements GameService {
 
         boolean played = false;
 
-        if((card.getLastPlay().getNonBonusHits().size() == 4 && card.getCurrentPlay() ==0)  || (card.getLastPlay().getNonBonusHits().size() == 3 && card.getCurrentPlay() ==1) || isWinnig(card)){
+        if((card.getLastPlay().getNonBonusHits().size() == maxAttempts(card.getCardNumber()) && card.getCurrentPlay() ==0)  || (card.getLastPlay().getNonBonusHits().size() == 3 && card.getCurrentPlay() ==1) || isWinnig(card)){
             played = true;
         }
 
@@ -253,13 +290,16 @@ public class GameServiceImpl implements GameService {
 
         int attempts = card.getLastPlay().getNonBonusHits().size();
         if(isWinnig(card)){
-            //attempts--;
+            attempts--;
         }
-        else{
-            if(card.getLastPlay().getBonusHits().isPresent()){
+        else if(card.getCurrentPlay() == 0){
+            BonusPin bonusPin = bonusPinRepository.findByCardNumber(card.getCardNumber());
+            if(bonusPin != null && bonusPin.isFreeAttempt()){
                 attempts--;
+                cardDto.setFreeAttempt(true);
             }
         }
+
         switch(attempts){
             case 0:
                 cardDto.setBalance(card.getBatch().getPayout1().doubleValue());

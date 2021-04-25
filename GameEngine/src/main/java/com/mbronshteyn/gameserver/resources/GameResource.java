@@ -35,7 +35,7 @@ public class GameResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Authinticate Card", notes="authinticates Card before game")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Card Successfully Authinticated", response = CardDto.class)})
-    public CardDto logingCard(@ApiParam(name = "authCard", value = "AuthinticateDto contaning parameters to authinticate card", required = true) AuthinticateDto authDto){
+    public CardDto logingCard(@ApiParam(name = "authCard", value = "AuthinticateDto containing parameters to authinticate card", required = true) AuthinticateDto authDto){
 
         try {
             return gameService.logingCard(authDto);
@@ -92,7 +92,7 @@ public class GameResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Save Email", notes="Sends Player Email")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Email is saved successfully")})
-    public void sendEmail(@ApiParam(name = "winnerObect", value = "WinnerEmailDto contaning card and email info", required = true) WinnerEmailDto winnerEmailDto){
+    public void sendEmail(@ApiParam(name = "winnerObect", value = "WinnerEmailDto containing card and email info", required = true) WinnerEmailDto winnerEmailDto){
         try {
             gameService.saveEmail(winnerEmailDto);
         } catch (GameServerException e) {
@@ -108,11 +108,27 @@ public class GameResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Card play history", notes="teturns play history of a card")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Card Successfully Retrieved", response = HistoryDto.class)})
-    public HistoryDto getHistory(@ApiParam(name = "authCard", value = "AuthinticateDto contaning parameters to authinticate card", required = true) AuthinticateDto authDto){
+    public HistoryDto getHistory(@ApiParam(name = "authCard", value = "AuthinticateDto containing parameters to authenticate card", required = true) AuthinticateDto authDto){
         try {
             return gameService.getHistory(authDto);
         } catch (GameServerException e) {
             LOGGER.error("Card is not authinticated");
+            Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    @POST
+    @Path("/freeAttempt")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Free Attempt\"", notes="Registers Free Attempt")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Free Attempt Successfully Updated", response = CardDto.class)})
+    public CardDto saveFreeAttempt(@ApiParam(name = "authCard", value = "AuthinticateDto containing parameters for card", required = true) AuthinticateDto saveFreeAttempt){
+        try {
+            return gameService.saveFreeAttempt(saveFreeAttempt);
+        } catch (GameServerException e) {
+            LOGGER.error("Free Attempt is not saved");
             Response response = Response.status(e.getErrorStatus()).header("message",e.getMessage()).header("errorCode",e.getErrorCode().toString()).build();
             throw new WebApplicationException(response);
         }

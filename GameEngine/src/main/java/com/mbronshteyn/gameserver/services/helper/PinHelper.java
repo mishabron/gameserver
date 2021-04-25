@@ -38,6 +38,7 @@ public class PinHelper {
             bonusPin.setId(id);
             bonusPin.setActive(true);
             bonusPin.setUsed(false);
+            bonusPin.setFreeAttempt(false);
             bonusPins.add(bonusPin);
         }
 

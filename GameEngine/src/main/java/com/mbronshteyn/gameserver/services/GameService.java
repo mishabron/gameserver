@@ -13,5 +13,7 @@ public interface GameService {
 
     void saveEmail(WinnerEmailDto winnerEmailDto) throws GameServerException;
 
+    CardDto saveFreeAttempt(AuthinticateDto authDto) throws GameServerException;;
+
     HistoryDto getHistory(AuthinticateDto authDto) throws GameServerException;
 }

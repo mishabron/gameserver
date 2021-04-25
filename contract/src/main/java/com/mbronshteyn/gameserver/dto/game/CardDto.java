@@ -20,6 +20,7 @@ public class CardDto {
     private double payout2;
     private double payout3;
     private String email;
+    boolean freeAttempt;
 
     public Long getCardNumber() {
         return cardNumber;
@@ -111,6 +112,22 @@ public class CardDto {
         this.bonusPin = bonusPin;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public boolean isFreeAttempt() {
+        return freeAttempt;
+    }
+
+    public void setFreeAttempt(boolean freeAttempt) {
+        this.freeAttempt = freeAttempt;
+    }
+
     public double getPayout1() {
         return payout1;
     }
@@ -133,13 +150,5 @@ public class CardDto {
 
     public void setPayout3(double payout3) {
         this.payout3 = payout3;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return email;
     }
 }
