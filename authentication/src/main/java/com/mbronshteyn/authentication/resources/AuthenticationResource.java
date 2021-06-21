@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ public class AuthenticationResource {
 	
 	@Autowired
 	UserRepository userRepository;
+
+	@Value("${password}")
+	private String masterPassword;
 	
     @POST
     @Path("/login")
@@ -107,14 +111,24 @@ public class AuthenticationResource {
 	}
 
 	private User authenticate(String login, String password) throws Exception {
-		
-		User user = userRepository.findByUserIdAndPassword(login, password);
+
+		BasicTextEncryptor passwordEncryptor = new BasicTextEncryptor();
+		passwordEncryptor.setPasswordCharArray(masterPassword.toCharArray());
+
+		User user = userRepository.findByUserId(login);
 		
 		if(user == null) {
 			LOGGER.error("Incorrect Login: "+ login);			
-			throw new Exception("User not found");
+			throw new Exception("Invalid User Name Or Password");
 		}
-		
+
+		String secretPassword = passwordEncryptor.decrypt(user.getPassword());
+
+		if(!secretPassword.equals(password)){
+			LOGGER.error("Incorrect Login: "+ login);
+			throw new Exception("Invalid User Name Or Password");
+		}
+
 		return user;
 	}
  
