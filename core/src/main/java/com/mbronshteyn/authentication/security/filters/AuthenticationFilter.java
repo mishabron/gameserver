@@ -19,7 +19,6 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
 import java.security.Principal;
 
 @Component
@@ -27,7 +26,7 @@ import java.security.Principal;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationFilter.class);
 	
 	private String SECRET;		
 	private String ISSUER;	
