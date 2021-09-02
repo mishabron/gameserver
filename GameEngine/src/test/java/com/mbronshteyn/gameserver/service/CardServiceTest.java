@@ -140,12 +140,12 @@ public class CardServiceTest {
 
         BonusGenDto bonusGenDto = new BonusGenDto();
         bonusGenDto.setBatchId(batch.getId());
-        bonusGenDto.setNumberOfBonusPins1(100);
-        bonusGenDto.setNumberOfSuperPins1(0);
+        bonusGenDto.setNumberOfBonusPins1(40);
         bonusGenDto.setNumberOfBonusPins2(0);
-        bonusGenDto.setNumberOfSuperPins2(100);
         bonusGenDto.setNumberOfBonusPins3(60);
-        bonusGenDto.setNumberOfSuperPins3(40);
+        bonusGenDto.setNumberOfSuperPins1(0);
+        bonusGenDto.setNumberOfSuperPins2(100);
+        bonusGenDto.setNumberOfSuperPins3(0);
         cardService.generateBonuses(bonusGenDto);
 
         CardBatch testBatch = cardBatchRepository.findByBarcode(batch.getBarcode());
@@ -154,7 +154,7 @@ public class CardServiceTest {
         int bonus2 = Math.toIntExact(testBatch.getBonusPins().stream().filter(b -> b.getId().getSequence() == 2).count());
         int bonus3 = Math.toIntExact(testBatch.getBonusPins().stream().filter(b -> b.getId().getSequence() == 3).count());
 
-        Assert.assertEquals(100,bonus1);
+        Assert.assertEquals(40,bonus1);
         Assert.assertEquals(0,bonus2);
         Assert.assertEquals(60,bonus3);
 
@@ -164,7 +164,7 @@ public class CardServiceTest {
 
         Assert.assertEquals(0,super1);
         Assert.assertEquals(100,super2);
-        Assert.assertEquals(40,super3);
+        Assert.assertEquals(0,super3);
 
     }
 

@@ -86,9 +86,9 @@ public class PinHelper {
         return cards;
     }
 
-    public List<Integer>  generateUniquePins(int total, int fromNumber, int numberOfPins){
+    public List<Integer>  generateUniquePins(int total, int cardsPlayed, int numberOfPins){
 
-        return ThreadLocalRandom.current().ints(1, total+1).distinct().limit(numberOfPins).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
+        return ThreadLocalRandom.current().ints(1, total+1).distinct().limit(numberOfPins-cardsPlayed).mapToObj(p -> new Integer(p)).collect(Collectors.toList());
     }
 
     public String generateUniquePin(Card card) {

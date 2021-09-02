@@ -94,7 +94,7 @@ public class CardsEntitiesTest {
         int bonusPins = 50;
         int superPins = 50;
 
-        List<Integer> generatedPins = pinHelper.generateUniquePins(numberOfCards,1,bonusPins + superPins);
+        List<Integer> generatedPins = pinHelper.generateUniquePins(numberOfCards,0,bonusPins + superPins);
         Set<Integer> uniquePins = new HashSet<Integer>(generatedPins);
         assertEquals(generatedPins.size(),uniquePins.size());
 
@@ -132,7 +132,7 @@ public class CardsEntitiesTest {
         int bonusPins = 10;
         int superPins = 5;
 
-        List<Integer> generatedPins = pinHelper.generateUniquePins(100,1,bonusPins + superPins);
+        List<Integer> generatedPins = pinHelper.generateUniquePins(100,0,bonusPins + superPins);
 
         List<Integer> pinsBonus = generatedPins.subList(0, bonusPins);
         List<Integer> pinsSuper = generatedPins.subList(bonusPins , generatedPins.size());
