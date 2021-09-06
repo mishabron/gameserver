@@ -4,16 +4,13 @@ import com.mbronshteyn.data.cards.Card;
 import com.mbronshteyn.data.cards.CardBatch;
 import com.mbronshteyn.data.cards.Game;
 import com.mbronshteyn.data.cards.Play;
-import com.mbronshteyn.data.cards.repository.CardBatchRepository;
-import com.mbronshteyn.data.cards.repository.CardRepository;
-import com.mbronshteyn.data.cards.repository.GameRepository;
+import com.mbronshteyn.data.cards.repository.*;
 import com.mbronshteyn.gameserver.audit.SecurityUser;
 import com.mbronshteyn.gameserver.dto.card.BatchDto;
 import com.mbronshteyn.gameserver.dto.card.BonusGenDto;
 import com.mbronshteyn.gameserver.exception.GameServerException;
 import com.mbronshteyn.gameserver.services.CardService;
 import com.mbronshteyn.gameserver.services.helper.PinHelper;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -43,6 +40,12 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     SecurityUser securityUser;
+
+    @Autowired
+    BonusPinRepository bonusPinRepository;
+
+    @Autowired
+    SuperPinRepository superPinRepository;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -148,9 +151,8 @@ public class CardServiceImpl implements CardService {
         }
 
         //clear existing bonuses
-        cardBarch.getBonusPins().clear();
-        cardBarch.getSuperPins().clear();
-        cardBatchRepository.saveAndFlush(cardBarch);
+        bonusPinRepository.deleteByBatchId(cardBarch.getId());
+        superPinRepository.deleteByBatchId(cardBarch.getId());
 
         BonustData bonustData = new BonustData(bonusGenDto.getNumberOfBonusPins1(),
                 bonusGenDto.getNumberOfBonusPins2(),
