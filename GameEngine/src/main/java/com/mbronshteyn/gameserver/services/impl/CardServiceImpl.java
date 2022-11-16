@@ -70,7 +70,8 @@ public class CardServiceImpl implements CardService {
         LOGGER.info("Genereating Cards");
         batch.setCards(pinHelper.generateBulkCard(batch,batchDto.getNumberOfCards()));
 
-        BonustData bonustData = new BonustData(batchDto.getNumberOfBonusPins1(),
+        BonustData bonustData = new BonustData(
+                batchDto.getNumberOfBonusPins1(),
                 batchDto.getNumberOfBonusPins2(),
                 batchDto.getNumberOfBonusPins3(),
                 batchDto.getNumberOfSuperPins1(),
@@ -154,7 +155,8 @@ public class CardServiceImpl implements CardService {
         bonusPinRepository.deleteByBatchId(cardBarch.getId());
         superPinRepository.deleteByBatchId(cardBarch.getId());
 
-        BonustData bonustData = new BonustData(bonusGenDto.getNumberOfBonusPins1(),
+        BonustData bonustData = new BonustData(
+                bonusGenDto.getNumberOfBonusPins1(),
                 bonusGenDto.getNumberOfBonusPins2(),
                 bonusGenDto.getNumberOfBonusPins3(),
                 bonusGenDto.getNumberOfSuperPins1(),
@@ -167,7 +169,24 @@ public class CardServiceImpl implements CardService {
     }
 
     @Transactional
-    private CardBatch generateBonuses(CardBatch batch, BonustData bonustData){
+    private CardBatch generateBonuses(CardBatch batch, BonustData bonustData) throws GameServerException{
+
+        //validate input
+        if(bonustData.getNumberOfBonusPins1() + bonustData.getNumberOfBonusPins2() + bonustData.getNumberOfBonusPins3() > 100){
+            throw new GameServerException("Number of requested BunusPins exceeds 100%");
+        }
+        if(bonustData.getNumberOfSuperPins1() + bonustData.getNumberOfSuperPins2() + bonustData.getNumberOfSuperPins3() > 100){
+            throw new GameServerException("Number of requested SuperPins exceeds 100%");
+        }
+        if(bonustData.getNumberOfBonusPins1() >0 && bonustData.getNumberOfSuperPins1() >0){
+            throw new GameServerException("Conflict between Bonus and Super pins for attemps #1");
+        }
+        if(bonustData.getNumberOfBonusPins2() >0 && bonustData.getNumberOfSuperPins2() >0){
+            throw new GameServerException("Conflict between Bonus and Super pins for attemps #2");
+        }
+        if(bonustData.getNumberOfBonusPins3() >0 && bonustData.getNumberOfSuperPins3() >0){
+            throw new GameServerException("Conflict between Bonus and Super pins for attemps #3");
+        }
 
         int batchSize = batch.getCardsInBatch();
         int cardsPlayed = Math.toIntExact(batch.getCards().stream().filter(c -> c.isPlayed()).count());

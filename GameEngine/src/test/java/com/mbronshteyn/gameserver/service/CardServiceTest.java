@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RunWith(SpringRunner.class)
@@ -127,7 +126,7 @@ public class CardServiceTest {
         batchDto.setGameName("Pingo");
         batchDto.setNumberOfCards(1000);
         batchDto.setNumberOfBonusPins1(50);
-        batchDto.setNumberOfSuperPins1(20);
+        batchDto.setNumberOfSuperPins2(20);
 
         CardBatch batch = cardService.generateCardsForBatch(batchDto);
         CardBatch testBatch = cardBatchRepository.findByBarcode(batch.getBarcode());
@@ -166,6 +165,76 @@ public class CardServiceTest {
         Assert.assertEquals(100,super2);
         Assert.assertEquals(0,super3);
 
+    }
+
+    @Test(expected = GameServerException.class)
+    public void testBonusGenerationWithMaxLimitError1() throws GameServerException {
+
+        BonusGenDto bonusGenDto = new BonusGenDto();
+        bonusGenDto.setBatchId(batch.getId());
+        bonusGenDto.setNumberOfBonusPins1(40);
+        bonusGenDto.setNumberOfBonusPins2(10);
+        bonusGenDto.setNumberOfBonusPins3(60);
+        bonusGenDto.setNumberOfSuperPins1(0);
+        bonusGenDto.setNumberOfSuperPins2(100);
+        bonusGenDto.setNumberOfSuperPins3(0);
+        cardService.generateBonuses(bonusGenDto);
+    }
+
+    @Test(expected = GameServerException.class)
+    public void testBonusGenerationWithMaxLimitError2() throws GameServerException {
+
+        BonusGenDto bonusGenDto = new BonusGenDto();
+        bonusGenDto.setBatchId(batch.getId());
+        bonusGenDto.setNumberOfBonusPins1(0);
+        bonusGenDto.setNumberOfBonusPins2(0);
+        bonusGenDto.setNumberOfBonusPins3(0);
+        bonusGenDto.setNumberOfSuperPins1(10);
+        bonusGenDto.setNumberOfSuperPins2(100);
+        bonusGenDto.setNumberOfSuperPins3(0);
+        cardService.generateBonuses(bonusGenDto);
+    }
+
+    @Test(expected = GameServerException.class)
+    public void testBonusGenerationWithConflictErrorAttempt1() throws GameServerException {
+
+        BonusGenDto bonusGenDto = new BonusGenDto();
+        bonusGenDto.setBatchId(batch.getId());
+        bonusGenDto.setNumberOfBonusPins1(10);
+        bonusGenDto.setNumberOfBonusPins2(10);
+        bonusGenDto.setNumberOfBonusPins3(10);
+        bonusGenDto.setNumberOfSuperPins1(10);
+        bonusGenDto.setNumberOfSuperPins2(0);
+        bonusGenDto.setNumberOfSuperPins3(0);
+        cardService.generateBonuses(bonusGenDto);
+    }
+
+    @Test(expected = GameServerException.class)
+    public void testBonusGenerationWithConflictErrorAttempt2() throws GameServerException {
+
+        BonusGenDto bonusGenDto = new BonusGenDto();
+        bonusGenDto.setBatchId(batch.getId());
+        bonusGenDto.setNumberOfBonusPins1(0);
+        bonusGenDto.setNumberOfBonusPins2(10);
+        bonusGenDto.setNumberOfBonusPins3(10);
+        bonusGenDto.setNumberOfSuperPins1(0);
+        bonusGenDto.setNumberOfSuperPins2(10);
+        bonusGenDto.setNumberOfSuperPins3(0);
+        cardService.generateBonuses(bonusGenDto);
+    }
+
+    @Test(expected = GameServerException.class)
+    public void testBonusGenerationWithConflictErrorAttempt3() throws GameServerException {
+
+        BonusGenDto bonusGenDto = new BonusGenDto();
+        bonusGenDto.setBatchId(batch.getId());
+        bonusGenDto.setNumberOfBonusPins1(0);
+        bonusGenDto.setNumberOfBonusPins2(0);
+        bonusGenDto.setNumberOfBonusPins3(10);
+        bonusGenDto.setNumberOfSuperPins1(0);
+        bonusGenDto.setNumberOfSuperPins2(0);
+        bonusGenDto.setNumberOfSuperPins3(10);
+        cardService.generateBonuses(bonusGenDto);
     }
 
     @Test
